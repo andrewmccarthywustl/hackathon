@@ -8,15 +8,6 @@ interface ResearcherOnboardingProps {
   onComplete: (profile: ResearcherProfile) => void;
 }
 
-const AVATAR_ICONS = [
-  '👨‍🔬', '👩‍🔬', '🧑‍🔬',
-  '👨‍💻', '👩‍💻', '🧑‍💻',
-  '👨‍🎓', '👩‍🎓', '🧑‍🎓',
-  '🧪', '🔬', '🧬',
-  '🌟', '🚀', '💡',
-  '📚', '🎯', '⚡'
-];
-
 export function ResearcherOnboarding({ googleEmail, googleName, onComplete }: ResearcherOnboardingProps) {
   const [profile, setProfile] = useState<Partial<ResearcherProfile>>({
     name: googleName,
@@ -27,8 +18,7 @@ export function ResearcherOnboarding({ googleEmail, googleName, onComplete }: Re
     bio: '',
     homepage: '',
     orcid: '',
-    googleScholar: '',
-    avatarIcon: ''
+    googleScholar: ''
   });
 
   const [interestInput, setInterestInput] = useState('');
@@ -37,10 +27,6 @@ export function ResearcherOnboarding({ googleEmail, googleName, onComplete }: Re
 
   const handleInputChange = (field: keyof ResearcherProfile, value: string) => {
     setProfile(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleIconSelect = (icon: string) => {
-    setProfile(prev => ({ ...prev, avatarIcon: icon }));
   };
 
   const addResearchInterest = () => {
@@ -62,19 +48,16 @@ export function ResearcherOnboarding({ googleEmail, googleName, onComplete }: Re
 
   const canProceed = () => {
     if (currentStep === 1) {
-      return profile.avatarIcon && profile.avatarIcon !== '';
-    }
-    if (currentStep === 2) {
       return profile.institution && profile.institution.trim() !== '';
     }
-    if (currentStep === 3) {
+    if (currentStep === 2) {
       return (profile.researchInterests?.length || 0) > 0;
     }
     return true;
   };
 
   const handleNext = () => {
-    if (canProceed() && currentStep < 4) {
+    if (canProceed() && currentStep < 3) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -101,7 +84,6 @@ export function ResearcherOnboarding({ googleEmail, googleName, onComplete }: Re
       homepage: profile.homepage,
       orcid: profile.orcid,
       googleScholar: profile.googleScholar,
-      avatarIcon: profile.avatarIcon,
       createdAt: new Date().toISOString()
     };
 
@@ -138,48 +120,17 @@ export function ResearcherOnboarding({ googleEmail, googleName, onComplete }: Re
           <div className="progress-bar">
             <div
               className="progress-fill"
-              style={{ width: `${(currentStep / 4) * 100}%` }}
+              style={{ width: `${(currentStep / 3) * 100}%` }}
             />
           </div>
           <div className="step-indicator">
-            Step {currentStep} of 4
+            Step {currentStep} of 3
           </div>
         </div>
 
         <div className="onboarding-content">
-          {/* Step 1: Avatar Selection */}
+          {/* Step 1: Basic Information */}
           {currentStep === 1 && (
-            <div className="step-content">
-              <h2>Choose Your Avatar</h2>
-              <p className="step-description">
-                Select an icon to represent your profile
-              </p>
-
-              <div className="avatar-preview">
-                {profile.avatarIcon ? (
-                  <span className="avatar-icon-large">{profile.avatarIcon}</span>
-                ) : (
-                  <div className="avatar-placeholder">?</div>
-                )}
-              </div>
-
-              <div className="avatar-grid">
-                {AVATAR_ICONS.map((icon, index) => (
-                  <button
-                    key={index}
-                    className={`avatar-option ${profile.avatarIcon === icon ? 'selected' : ''}`}
-                    onClick={() => handleIconSelect(icon)}
-                    type="button"
-                  >
-                    {icon}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Step 2: Basic Information */}
-          {currentStep === 2 && (
             <div className="step-content">
               <h2>Basic Information</h2>
               <p className="step-description">
@@ -233,8 +184,8 @@ export function ResearcherOnboarding({ googleEmail, googleName, onComplete }: Re
             </div>
           )}
 
-          {/* Step 3: Research Interests */}
-          {currentStep === 3 && (
+          {/* Step 2: Research Interests */}
+          {currentStep === 2 && (
             <div className="step-content">
               <h2>Research Interests</h2>
               <p className="step-description">
@@ -281,8 +232,8 @@ export function ResearcherOnboarding({ googleEmail, googleName, onComplete }: Re
             </div>
           )}
 
-          {/* Step 4: Professional Links */}
-          {currentStep === 4 && (
+          {/* Step 3: Professional Links */}
+          {currentStep === 3 && (
             <div className="step-content">
               <h2>Professional Links</h2>
               <p className="step-description">
@@ -331,7 +282,7 @@ export function ResearcherOnboarding({ googleEmail, googleName, onComplete }: Re
             Back
           </button>
 
-          {currentStep < 4 ? (
+          {currentStep < 3 ? (
             <button
               className="btn-primary"
               onClick={handleNext}

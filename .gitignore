@@ -13,6 +13,7 @@ dist-ssr
 *.local
 .env
 server/dist
+server/data
 
 # API Keys and secrets
 key.txt

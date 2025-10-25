@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { createChatRouter } from './routes/chat.routes.js';
 import { createProfileRouter } from './routes/profile.routes.js';
 import { createChatKitRouter } from './routes/chatkit.routes.js';
+import { createResearchCompareRouter } from './routes/research-compare.routes.js';
 import { loadAIConfig, validateAIConfig } from './config/ai.config.js';
 
 // Load environment variables
@@ -37,6 +38,7 @@ try {
 app.use('/api', createChatRouter());
 app.use('/api', createProfileRouter());
 app.use('/api', createChatKitRouter());
+app.use('/api', createResearchCompareRouter());
 
 // Health check
 app.get('/health', (req, res) => {

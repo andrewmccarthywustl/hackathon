@@ -3,8 +3,18 @@
 .chat-wrapper {
   display: flex;
   flex-direction: row;
+  flex: 1;
   height: 100%;
   background: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+.chat-main-area {
+  display: flex;
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
   position: relative;
 }
 
@@ -14,7 +24,6 @@
   flex-direction: column;
   height: 100%;
   overflow: hidden;
-  order: 2;
 }
 
 /* ==================== MESSAGES ==================== */
@@ -315,101 +324,113 @@
   transform: none;
 }
 
-/* ==================== RESULTS SIDEBAR ==================== */
+/* ==================== PAPERS DRAWER ==================== */
 
-.results-sidebar {
-  width: 380px;
-  background: #ffffff;
-  overflow-y: auto;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  transition: width 0.3s ease, margin 0.3s ease;
-}
-
-.results-sidebar.left {
-  border-right: 1px solid #c9c3b8;
-  border-left: none;
-  order: 1; /* Explicitly set to come before chat-container (which is order: 2) */
-}
-
-.results-sidebar.collapsed {
-  width: 48px;
-  overflow: hidden;
-}
-
-.sidebar-toggle {
+.papers-toggle {
   position: absolute;
   top: 1rem;
-  right: 0.5rem;
-  width: 32px;
-  height: 32px;
-  background: #2d2d2d;
-  color: #ffffff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+  left: 1rem;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 1px solid #d7d0c4;
+  background: #fff8ee;
+  font-size: 1.2rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1rem;
-  font-weight: bold;
-  transition: all 0.2s ease;
-  z-index: 20;
-  padding: 0;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  z-index: 25;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.sidebar-toggle:hover {
-  background: #1a1a1a;
-  transform: scale(1.05);
+.papers-toggle:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
 }
 
-.sidebar-toggle:active {
-  transform: scale(0.95);
+.papers-drawer-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 4rem;
+  z-index: 40;
 }
 
-.results-sidebar.collapsed .sidebar-toggle {
-  right: 0.5rem;
-}
-
-.results-sidebar h3 {
-  margin: 0;
-  padding: 1.5rem 3rem 1.5rem 1.5rem; /* Extra padding on right for toggle button */
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #6b6558;
-  border-bottom: 1px solid #c9c3b8;
+.papers-drawer {
+  width: min(420px, calc(100% - 2rem));
+  max-height: calc(100vh - 6rem);
   background: #ffffff;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
+  border-radius: 20px;
+  border: 1px solid #e8e0d3;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
 }
 
-.papers-list,
-.researchers-list {
-  padding: 1rem;
+.papers-drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.25rem 1.5rem 0.5rem;
+  gap: 1rem;
+}
+
+.papers-drawer-label {
+  margin: 0;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  color: #9a9186;
+}
+
+.papers-drawer-header h3 {
+  margin: 0.1rem 0 0;
+  font-size: 1.35rem;
+  color: #2d2d2d;
+}
+
+.papers-drawer-close {
+  border: none;
+  background: #f5ebe0;
+  color: #2d2d2d;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.papers-search-box {
+  padding: 0.5rem 1.5rem 0;
+}
+
+.papers-search-box input {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #d6cec2;
+  padding: 0.65rem 0.9rem;
+  font-size: 0.95rem;
+}
+
+.papers-drawer-content {
+  padding: 1rem 1.5rem 1.5rem;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
-.researcher-item {
-  padding: 1rem 1.25rem;
-  background: #f5f1e8;
-  border: 1px solid #c9c3b8;
-  border-radius: 8px;
-  font-size: 0.875rem;
-  color: #2d2d2d;
-  line-height: 1.5;
-  transition: all 0.15s ease;
-  cursor: pointer;
+.papers-drawer-content .paper-card {
+  width: 100%;
 }
 
-.researcher-item:hover {
-  border-color: #2d2d2d;
-  background: #ebe5d8;
-  transform: translateX(-2px);
+.papers-empty {
+  color: #6b6558;
+  font-size: 0.95rem;
+  padding: 1rem 0;
 }

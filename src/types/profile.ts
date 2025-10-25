@@ -8,5 +8,6 @@ export interface ResearcherProfile {
   homepage?: string;
   orcid?: string;
   googleScholar?: string;
+  avatarIcon?: string;
   createdAt: string;
 }

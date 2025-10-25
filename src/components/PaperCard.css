@@ -11,6 +11,30 @@
   outline: none;
 }
 
+.save-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #c9c3b8;
+  transition: all 0.2s ease;
+  padding: 0.25rem;
+  line-height: 1;
+  z-index: 10;
+}
+
+.save-btn:hover {
+  color: #f59e0b;
+  transform: scale(1.1);
+}
+
+.save-btn.saved {
+  color: #f59e0b;
+}
+
 .paper-card:hover {
   border-color: #2d2d2d;
   background: #ffffff;

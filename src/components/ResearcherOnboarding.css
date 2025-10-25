@@ -276,6 +276,68 @@
   cursor: not-allowed;
 }
 
+/* ==================== AVATAR SELECTION ==================== */
+
+.avatar-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.avatar-icon-large {
+  font-size: 6rem;
+  line-height: 1;
+}
+
+.avatar-placeholder {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: #ebe5d8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  color: #c9c3b8;
+}
+
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+  gap: 1rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.avatar-option {
+  width: 70px;
+  height: 70px;
+  border: 2px solid #c9c3b8;
+  border-radius: 12px;
+  background: #f5f1e8;
+  font-size: 2.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.avatar-option:hover {
+  border-color: #2d2d2d;
+  background: #ffffff;
+  transform: scale(1.1);
+}
+
+.avatar-option.selected {
+  border-color: #2d2d2d;
+  background: #2d2d2d;
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(45, 45, 45, 0.2);
+}
+
 /* ==================== RESPONSIVE ==================== */
 
 @media (max-width: 768px) {
