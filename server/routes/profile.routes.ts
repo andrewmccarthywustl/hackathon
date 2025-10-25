@@ -3,7 +3,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { Logger } from '../utils/logger.js';
 
-const logger = new Logger();
+const logger = new Logger('ProfileRouter');
 
 export function createProfileRouter(): Router {
   const router = Router();

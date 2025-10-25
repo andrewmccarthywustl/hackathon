@@ -1,20 +1,24 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 import { ChatMessage, ArxivPaper } from '../types';
 import { ArxivService } from './arxiv.service';
 import { SemanticScholarService } from './semantic-scholar.service';
 import { OpenAlexService } from './openalex.service';
 import { Logger } from '../utils/logger';
+import { BaseAIService, type AIResponse, type ChatContext } from './ai/base.service';
 
-export class GeminiService {
+export class GeminiService extends BaseAIService {
   private genAI: GoogleGenerativeAI;
   private model;
+  private modelName: string;
   private arxivService: ArxivService;
   private semanticScholar: SemanticScholarService;
   private openAlex: OpenAlexService;
   private logger: Logger;
 
-  constructor(apiKey: string) {
+  constructor(apiKey: string, model: string = 'gemini-2.5-flash') {
+    super();
     this.genAI = new GoogleGenerativeAI(apiKey);
+    this.modelName = model;
     this.arxivService = new ArxivService();
     this.semanticScholar = new SemanticScholarService();
     this.openAlex = new OpenAlexService();
@@ -28,14 +32,14 @@ export class GeminiService {
             name: 'searchPapers',
             description: 'Search for research papers across multiple sources (arXiv, Semantic Scholar). Use this when the user asks about papers, publications, or recent research on a topic.',
             parameters: {
-              type: 'object',
+              type: SchemaType.OBJECT,
               properties: {
                 query: {
-                  type: 'string',
+                  type: SchemaType.STRING,
                   description: 'The search query for papers (e.g., "quantum computing", "machine learning optimization")'
                 },
                 maxResults: {
-                  type: 'number',
+                  type: SchemaType.NUMBER,
                   description: 'Maximum number of papers to return (default: 10)'
                 }
               },
@@ -46,14 +50,14 @@ export class GeminiService {
             name: 'findResearchersByTopic',
             description: 'Find researchers working on specific topics across multiple databases. Use when asked about researchers in a field.',
             parameters: {
-              type: 'object',
+              type: SchemaType.OBJECT,
               properties: {
                 topic: {
-                  type: 'string',
+                  type: SchemaType.STRING,
                   description: 'The research topic or field'
                 },
                 maxResults: {
-                  type: 'number',
+                  type: SchemaType.NUMBER,
                   description: 'Maximum number of researchers (default: 15)'
                 }
               },
@@ -64,18 +68,18 @@ export class GeminiService {
             name: 'findResearchersByInstitution',
             description: 'Find researchers at a specific university or institution. Use this when the user mentions ANY institution name like "WashU", "Washington University", "MIT", "Stanford", or asks about researchers "at" a specific place. Examples: "researchers at WashU", "biomedical researchers at Washington University", "MIT professors working on AI".',
             parameters: {
-              type: 'object',
+              type: SchemaType.OBJECT,
               properties: {
                 institution: {
-                  type: 'string',
+                  type: SchemaType.STRING,
                   description: 'Institution name (e.g., "Washington University", "WashU", "MIT", "Stanford")'
                 },
                 topic: {
-                  type: 'string',
+                  type: SchemaType.STRING,
                   description: 'Optional: filter by research topic/field (e.g., "biomedical", "machine learning")'
                 },
                 maxResults: {
-                  type: 'number',
+                  type: SchemaType.NUMBER,
                   description: 'Maximum number of researchers (default: 20)'
                 }
               },
@@ -86,12 +90,12 @@ export class GeminiService {
             name: 'analyzeResearchField',
             description: 'Analyze a research field to understand trends, themes, and opportunities.',
             parameters: {
-              type: 'object',
+              type: SchemaType.OBJECT,
               properties: {
                 interests: {
-                  type: 'array',
+                  type: SchemaType.ARRAY,
                   items: {
-                    type: 'string'
+                    type: SchemaType.STRING
                   },
                   description: 'List of research interests or topics to analyze'
                 }
@@ -101,22 +105,26 @@ export class GeminiService {
           }
         ]
       }
-    ];
+    ] as const;
 
     this.model = this.genAI.getGenerativeModel({
-      model: 'gemini-2.5-flash',
-      tools
+      model: this.modelName,
+      tools: tools as any // Type assertion needed due to strict Gemini SDK typing
     });
+  }
+
+  getProviderName(): string {
+    return 'Gemini';
+  }
+
+  getModelName(): string {
+    return this.modelName;
   }
 
   /**
    * Unified chat with automatic function calling
    */
-  async chat(message: string, context?: ChatMessage[]): Promise<{
-    response: string;
-    papers?: ArxivPaper[];
-    researchers?: string[];
-  }> {
+  async chat(message: string, context: ChatContext[]): Promise<AIResponse> {
     const startTime = Date.now();
     this.logger.header(`NEW USER MESSAGE`);
     this.logger.info(`User query: "${message}"`);
@@ -125,11 +133,11 @@ export class GeminiService {
       // Filter out assistant messages that aren't from actual responses (like welcome message)
       // and ensure history starts with a user message
       let chatHistory = context
-        ?.filter(msg => msg.role === 'user' || msg.role === 'assistant')
+        .filter(msg => msg.role === 'user' || msg.role === 'assistant')
         .map(msg => ({
           role: msg.role === 'user' ? 'user' as const : 'model' as const,
           parts: [{ text: msg.content }]
-        })) || [];
+        }));
 
       // Remove leading assistant/model messages - history must start with user
       while (chatHistory.length > 0 && chatHistory[0].role === 'model') {
@@ -179,20 +187,39 @@ You operate in a thought → action → observation cycle. You can THINK about w
 3. **Observe**: Process the tool results
 4. **Repeat**: Call more tools if needed, or provide final answer
 
+## Presenting Papers:
+When you present research papers, use this compact format with the link as a button at the bottom:
+
+**Format:**
+### Paper Title
+*Authors*
+*Year · Citations (if available)*
+
+[📄 View Paper](arxiv_url_or_pdf_link)
+
 ## Presenting Researcher Contact Information:
-When you find researchers, you'll receive contact information. Present it in a formatted, helpful way:
+When you find researchers, present them in a **compact, scannable format** using this structure:
+
+**IMPORTANT FORMATTING RULES:**
+- Use level 3 headers (###) for researcher names (creates nice headers without too much spacing)
+- Put institution and stats on ONE line using italic formatting
+- Create clickable buttons for ALL available links using markdown link format with emoji icons
+- Group all buttons on a single line separated by spaces
+- Keep it tight - no extra blank lines between sections
 
 **Example Format:**
-Dr. Jane Smith
-Institution: MIT
-📧 Contact: name@university.edu
-🔗 Google Scholar: [link]
-🆔 ORCID: 0000-0002-1234-5678
-🌐 Homepage: [link]
-📊 Citations: 5,234 | Publications: 127
-🔬 Research Areas: Machine Learning, Computer Vision
+Level 3 header: Dr. Jane Smith
+Italic line: MIT · 5,234 citations · 127 publications
 
-Include all available contact methods (ORCID, Google Scholar, homepage, Twitter, Wikipedia, Scopus, OpenAlex profile).
+Button line: [icon Google Scholar](link) [icon ORCID](link) [icon Homepage](link) [icon OpenAlex](link)
+
+Bold Research: Machine Learning, Computer Vision
+
+**Key Points:**
+- One researcher = one compact block (name, stats line, buttons, research areas)
+- All buttons on ONE line for easy clicking
+- Use middle dot (·) to separate inline stats
+- Keep descriptions brief
 
 You are autonomous - make your own decisions about when to use tools. Be proactive and thorough.` }]
         }

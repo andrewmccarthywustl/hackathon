@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import type { ChatMessage, ChatResponse, ArxivPaper } from '../types';
 import PaperCard from './PaperCard';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import './Chat.css';
 
 const API_BASE = '/api';
@@ -103,7 +105,15 @@ export default function Chat() {
         <div className="chat-messages">
           {messages.map((msg, idx) => (
             <div key={idx} className={`message ${msg.role}`}>
-              <div className="message-content">{msg.content}</div>
+              <div className="message-content">
+                {msg.role === 'assistant' ? (
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {msg.content}
+                  </ReactMarkdown>
+                ) : (
+                  msg.content
+                )}
+              </div>
             </div>
           ))}
           {loading && (

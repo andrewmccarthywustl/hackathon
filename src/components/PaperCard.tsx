@@ -6,24 +6,39 @@ interface PaperCardProps {
 }
 
 export default function PaperCard({ paper }: PaperCardProps) {
+  const handleClick = () => {
+    if (paper.pdfLink) {
+      window.open(paper.pdfLink, '_blank', 'noopener,noreferrer');
+    }
+  };
+
   return (
-    <div className="paper-card">
+    <div
+      className="paper-card"
+      onClick={handleClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
+    >
       <h4>{paper.title}</h4>
       <div className="authors">
-        {paper.authors.slice(0, 5).join(', ')}
-        {paper.authors.length > 5 ? ' et al.' : ''}
+        {paper.authors.slice(0, 3).join(', ')}
+        {paper.authors.length > 3 ? ' et al.' : ''}
       </div>
-      <div className="summary">
-        {paper.summary.slice(0, 300)}...
+      <div className="metadata">
+        <span className="year">{paper.published.split('-')[0]}</span>
+        {paper.categories.length > 0 && (
+          <span className="categories">{paper.categories.slice(0, 2).join(', ')}</span>
+        )}
       </div>
-      <div className="categories">
-        {paper.categories.join(', ')}
+      <div className="paper-link-icon">
+        📄 View Paper
       </div>
-      {paper.pdfLink && (
-        <a href={paper.pdfLink} target="_blank" rel="noopener noreferrer" className="pdf-link">
-          View PDF
-        </a>
-      )}
     </div>
   );
 }

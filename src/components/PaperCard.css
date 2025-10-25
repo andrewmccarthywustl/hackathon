@@ -2,59 +2,80 @@
 
 .paper-card {
   background: #f5f1e8;
-  padding: 1.25rem;
+  padding: 1rem 1.25rem;
   border-radius: 8px;
   border: 1px solid #c9c3b8;
-  transition: all 0.15s ease;
+  transition: all 0.2s ease;
   cursor: pointer;
+  position: relative;
+  outline: none;
 }
 
 .paper-card:hover {
   border-color: #2d2d2d;
   background: #ffffff;
-  transform: translateX(-2px);
+  transform: translateX(-3px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.paper-card:active {
+  transform: translateX(-1px);
+}
+
+.paper-card:focus-visible {
+  outline: 2px solid #2d2d2d;
+  outline-offset: 2px;
 }
 
 .paper-card h4 {
   color: #2d2d2d;
-  margin: 0 0 0.75rem 0;
+  margin: 0 0 0.5rem 0;
   font-size: 0.9375rem;
   font-weight: 600;
   line-height: 1.4;
+  padding-right: 0.5rem;
 }
 
 .paper-card .authors {
   color: #6b6558;
   font-size: 0.8125rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
   line-height: 1.4;
+  font-style: italic;
 }
 
-.paper-card .summary {
-  color: #2d2d2d;
-  font-size: 0.8125rem;
-  line-height: 1.5;
+.paper-card .metadata {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
   margin-bottom: 0.75rem;
-}
-
-.paper-card .categories {
   font-size: 0.75rem;
   color: #6b6558;
-  margin-bottom: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
-.paper-card .pdf-link {
-  display: inline-block;
+.paper-card .metadata .year {
+  font-weight: 600;
   color: #2d2d2d;
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 0.8125rem;
-  border-bottom: 1px solid #c9c3b8;
-  transition: all 0.15s ease;
 }
 
-.paper-card .pdf-link:hover {
-  border-bottom-color: #2d2d2d;
+.paper-card .metadata .categories {
+  color: #6b6558;
+}
+
+.paper-card .paper-link-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8125rem;
+  color: #2d2d2d;
+  font-weight: 500;
+  padding: 0.4rem 0.75rem;
+  background: rgba(45, 45, 45, 0.06);
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.paper-card:hover .paper-link-icon {
+  background: #2d2d2d;
+  color: #ffffff;
 }

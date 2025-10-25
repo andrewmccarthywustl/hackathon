@@ -1,9 +1,9 @@
 import express, { Express } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import { GeminiService } from './services/gemini.service.js';
 import { createChatRouter } from './routes/chat.routes.js';
 import { createProfileRouter } from './routes/profile.routes.js';
+import { loadAIConfig, validateAIConfig } from './config/ai.config.js';
 
 // Load environment variables
 dotenv.config();
@@ -15,17 +15,25 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// Initialize services
-const geminiApiKey = process.env.GEMINI_API_KEY;
-if (!geminiApiKey) {
-  console.error('ERROR: GEMINI_API_KEY is not set in environment variables');
+// Validate AI configuration on startup
+try {
+  const aiConfig = loadAIConfig();
+  validateAIConfig(aiConfig);
+  console.log(`✅ AI Provider: ${aiConfig.provider}`);
+  if (aiConfig.provider === 'gemini') {
+    console.log(`   Model: ${aiConfig.gemini?.model}`);
+  } else if (aiConfig.provider === 'openai') {
+    console.log(`   Model: ${aiConfig.openai?.model}`);
+  } else if (aiConfig.provider === 'claude') {
+    console.log(`   Model: ${aiConfig.claude?.model}`);
+  }
+} catch (error) {
+  console.error('❌ AI Configuration Error:', error);
   process.exit(1);
 }
 
-const geminiService = new GeminiService(geminiApiKey);
-
 // Routes
-app.use('/api', createChatRouter(geminiService));
+app.use('/api', createChatRouter());
 app.use('/api', createProfileRouter());
 
 // Health check
