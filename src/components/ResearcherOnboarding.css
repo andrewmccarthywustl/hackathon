@@ -1,0 +1,306 @@
+/* ==================== ONBOARDING CONTAINER ==================== */
+
+.onboarding-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: clamp(1.5rem, 4vw, 3rem) 1rem;
+  background: linear-gradient(135deg, #f5f1e8 0%, #ebe5d8 100%);
+  overflow-y: auto;
+}
+
+.app.onboarding-route .onboarding-container {
+  background: transparent;
+  width: min(780px, 100%);
+  margin: 0 auto;
+  padding: clamp(1.5rem, 4vw, 3rem) 0;
+}
+
+.onboarding-card {
+  width: 100%;
+  max-width: 600px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  border: 1px solid #c9c3b8;
+  overflow: hidden;
+}
+
+/* ==================== HEADER ==================== */
+
+.onboarding-header {
+  padding: 2rem 2rem 1.5rem;
+  border-bottom: 1px solid #c9c3b8;
+  background: #f5f1e8;
+}
+
+.onboarding-header h1 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #2d2d2d;
+  margin: 0 0 0.5rem 0;
+}
+
+.onboarding-header > p {
+  font-size: 0.9375rem;
+  color: #6b6558;
+  margin: 0 0 1.5rem 0;
+}
+
+/* ==================== PROGRESS BAR ==================== */
+
+.progress-bar {
+  height: 6px;
+  background: #c9c3b8;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #2d2d2d;
+  transition: width 0.3s ease;
+}
+
+.step-indicator {
+  font-size: 0.8125rem;
+  color: #6b6558;
+  text-align: center;
+}
+
+/* ==================== CONTENT ==================== */
+
+.onboarding-content {
+  padding: 2rem;
+  min-height: 400px;
+}
+
+.step-content h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2d2d2d;
+  margin: 0 0 0.5rem 0;
+}
+
+.step-description {
+  font-size: 0.9375rem;
+  color: #6b6558;
+  margin: 0 0 2rem 0;
+  line-height: 1.5;
+}
+
+/* ==================== FORM GROUPS ==================== */
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: #2d2d2d;
+}
+
+.required {
+  color: #d32f2f;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #c9c3b8;
+  border-radius: 8px;
+  background: #f5f1e8;
+  font-size: 0.875rem;
+  font-family: inherit;
+  transition: all 0.15s ease;
+  color: #2d2d2d;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #2d2d2d;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(45, 45, 45, 0.05);
+}
+
+.form-group input:disabled {
+  background: #ebe5d8;
+  color: #6b6558;
+  cursor: not-allowed;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #9a9186;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.help-text {
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  color: #6b6558;
+  font-style: italic;
+}
+
+/* ==================== INTERESTS INPUT ==================== */
+
+.interests-input {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.interests-input input {
+  flex: 1;
+}
+
+.interests-input button {
+  padding: 0.75rem 1.5rem;
+  background: #2d2d2d;
+  color: #f5f1e8;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.interests-input button:hover {
+  background: #1a1a1a;
+}
+
+.interests-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  min-height: 40px;
+}
+
+.interest-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: #ebe5d8;
+  border: 1px solid #c9c3b8;
+  border-radius: 20px;
+  font-size: 0.8125rem;
+  color: #2d2d2d;
+}
+
+.interest-tag button {
+  background: none;
+  border: none;
+  color: #6b6558;
+  cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+}
+
+.interest-tag button:hover {
+  color: #d32f2f;
+}
+
+/* ==================== ACTIONS ==================== */
+
+.onboarding-actions {
+  display: flex;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #c9c3b8;
+  background: #f5f1e8;
+}
+
+.btn-primary,
+.btn-secondary {
+  flex: 1;
+  padding: 0.875rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: none;
+}
+
+.btn-primary {
+  background: #2d2d2d;
+  color: #f5f1e8;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #1a1a1a;
+  transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+  background: #c9c3b8;
+  color: #9a9186;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #2d2d2d;
+  border: 1px solid #c9c3b8;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background: #ebe5d8;
+  border-color: #2d2d2d;
+}
+
+.btn-secondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ==================== RESPONSIVE ==================== */
+
+@media (max-width: 768px) {
+  .onboarding-container {
+    padding: 1rem;
+  }
+
+  .onboarding-header {
+    padding: 1.5rem;
+  }
+
+  .onboarding-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .onboarding-content {
+    padding: 1.5rem;
+    min-height: 350px;
+  }
+
+  .step-content h2 {
+    font-size: 1.25rem;
+  }
+
+  .onboarding-actions {
+    padding: 1rem 1.5rem;
+  }
+}

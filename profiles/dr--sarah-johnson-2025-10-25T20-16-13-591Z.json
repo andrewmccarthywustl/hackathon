@@ -1,0 +1,14 @@
+{
+  "name": "Dr. Sarah Johnson",
+  "email": "sarah.johnson@university.edu",
+  "institution": "test",
+  "department": "test",
+  "researchInterests": [
+    "machine learning"
+  ],
+  "bio": "test",
+  "homepage": "",
+  "orcid": "",
+  "googleScholar": "",
+  "createdAt": "2025-10-25T20:16:13.557Z"
+}

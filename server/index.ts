@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { createChatRouter } from './routes/chat.routes.js';
 import { createProfileRouter } from './routes/profile.routes.js';
+import { createChatKitRouter } from './routes/chatkit.routes.js';
 import { loadAIConfig, validateAIConfig } from './config/ai.config.js';
 
 // Load environment variables
@@ -35,6 +36,7 @@ try {
 // Routes
 app.use('/api', createChatRouter());
 app.use('/api', createProfileRouter());
+app.use('/api', createChatKitRouter());
 
 // Health check
 app.get('/health', (req, res) => {

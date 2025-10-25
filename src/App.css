@@ -5,16 +5,51 @@
 }
 
 body, html {
-  height: 100%;
-  overflow: hidden;
+  min-height: 100%;
+  overflow-y: auto;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+  background: #f5f1e8;
 }
 
 .app {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   background: #ffffff;
+}
+
+.app.app-shell {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app.login-route,
+.app.onboarding-route,
+.app.landing-route {
+  height: auto;
+  min-height: 100vh;
+  overflow-y: auto;
+}
+
+.app.login-route,
+.app.onboarding-route {
+  display: flex;
+  padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 5vw, 4rem);
+  background: linear-gradient(135deg, #f5f1e8 0%, #ebe5d8 100%);
+}
+
+.app.login-route {
+  align-items: center;
+  justify-content: center;
+}
+
+.app.login-route .login-sidebar {
+  max-height: 90vh;
+}
+
+.app.onboarding-route {
+  align-items: flex-start;
+  justify-content: center;
 }
 
 /* ==================== HEADER ==================== */
