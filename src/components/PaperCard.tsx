@@ -1,4 +1,5 @@
 import type { ArxivPaper } from '../types';
+import './PaperCard.css';
 
 interface PaperCardProps {
   paper: ArxivPaper;

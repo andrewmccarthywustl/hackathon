@@ -1,0 +1,60 @@
+/* ==================== PAPER CARD ==================== */
+
+.paper-card {
+  background: #f5f1e8;
+  padding: 1.25rem;
+  border-radius: 8px;
+  border: 1px solid #c9c3b8;
+  transition: all 0.15s ease;
+  cursor: pointer;
+}
+
+.paper-card:hover {
+  border-color: #2d2d2d;
+  background: #ffffff;
+  transform: translateX(-2px);
+}
+
+.paper-card h4 {
+  color: #2d2d2d;
+  margin: 0 0 0.75rem 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.paper-card .authors {
+  color: #6b6558;
+  font-size: 0.8125rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+}
+
+.paper-card .summary {
+  color: #2d2d2d;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  margin-bottom: 0.75rem;
+}
+
+.paper-card .categories {
+  font-size: 0.75rem;
+  color: #6b6558;
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.paper-card .pdf-link {
+  display: inline-block;
+  color: #2d2d2d;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.8125rem;
+  border-bottom: 1px solid #c9c3b8;
+  transition: all 0.15s ease;
+}
+
+.paper-card .pdf-link:hover {
+  border-bottom-color: #2d2d2d;
+}

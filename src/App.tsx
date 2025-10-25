@@ -1,16 +1,54 @@
+import { useState } from 'react';
 import Chat from './components/Chat';
+import { Profile } from './components/Profile';
+import { Login } from './components/Login';
 import './App.css';
 
 function App() {
+  const [showProfile, setShowProfile] = useState(false);
+  const [currentUser, setCurrentUser] = useState<string | null>(null);
+
+  const handleLogin = (username: string) => {
+    setCurrentUser(username);
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+  };
+
   return (
     <div className="app">
-      <header className="header">
-        <h1>🔬 Researcher Chat</h1>
-        <p>Ask about papers, find researchers, or explore your field - AI automatically helps with the right tools</p>
+      <header className="app-header">
+        <div className="header-left">
+          <h1 className="app-title">Research Chronicle</h1>
+          <nav className="app-nav">
+            <button
+              className={`nav-btn ${!showProfile ? 'active' : ''}`}
+              onClick={() => setShowProfile(false)}
+            >
+              Chat
+            </button>
+            <button
+              className={`nav-btn ${showProfile ? 'active' : ''}`}
+              onClick={() => setShowProfile(true)}
+            >
+              Profile
+            </button>
+          </nav>
+        </div>
+        {currentUser && <div className="current-user">Logged in as {currentUser}</div>}
       </header>
 
-      <div className="main-content">
-        <Chat />
+      <div className="app-main">
+        <div className="content-wrapper">
+          {showProfile ? <Profile /> : <Chat />}
+        </div>
+
+        <Login
+          onLogin={handleLogin}
+          currentUser={currentUser}
+          onLogout={handleLogout}
+        />
       </div>
     </div>
   );

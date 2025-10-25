@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { GeminiService } from './services/gemini.service.js';
 import { createChatRouter } from './routes/chat.routes.js';
+import { createProfileRouter } from './routes/profile.routes.js';
 
 // Load environment variables
 dotenv.config();
@@ -25,6 +26,7 @@ const geminiService = new GeminiService(geminiApiKey);
 
 // Routes
 app.use('/api', createChatRouter(geminiService));
+app.use('/api', createProfileRouter());
 
 // Health check
 app.get('/health', (req, res) => {

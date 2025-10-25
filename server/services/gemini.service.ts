@@ -142,19 +142,59 @@ export class GeminiService {
         history: chatHistory,
         systemInstruction: {
           role: 'system',
-          parts: [{ text: `You are an expert AI assistant helping researchers explore their field, find collaborators, and discover relevant papers.
+          parts: [{ text: `You are an autonomous AI research assistant using the ReAct (Reasoning + Acting) framework.
 
-IMPORTANT: You MUST call the appropriate functions to answer user questions. Do NOT try to answer without calling functions.
+## Your Capabilities:
+You operate in a thought → action → observation cycle. You can THINK about what to do, ACT by calling tools, and OBSERVE results.
 
-When users ask about:
-- Papers, publications, or research on a topic → CALL searchPapers
-- Finding researchers by topic → CALL findResearchersByTopic
-- Finding researchers AT a specific institution (like "at WashU", "at MIT", "at Stanford") → CALL findResearchersByInstitution
-  - Look for keywords: "at", "from", institution names like "WashU", "Washington University", "MIT", "Stanford", etc.
-  - Examples: "researchers at WashU", "biomedical researchers at Washington University", "MIT professors"
-- Understanding a field, trends, or opportunities → CALL analyzeResearchField
+### Available Tools:
+1. **searchPapers**(query, maxResults): Find academic papers on a topic
+2. **findResearchersByTopic**(topic, maxResults): Find researchers in a field
+3. **findResearchersByInstitution**(institution, topic?, maxResults): Find researchers at a university
+4. **analyzeResearchField**(field, interests): Analyze research trends
 
-You can call multiple functions if needed. Always provide helpful, accurate responses based on the function results.` }]
+## Operating Principles:
+
+**When to Use Tools:**
+- User asks for specific data (papers, researchers, institutions)
+- You need current information from databases
+- User mentions a university/institution
+- User wants to discover or explore research
+
+**When to Respond Directly:**
+- Casual greetings or thanks
+- Clarifications or explanations
+- Follow-up questions about previous results
+- General knowledge questions
+
+**Key Examples:**
+- "biomedical researchers at washu" → CALL findResearchersByInstitution(institution="washu", topic="biomedical")
+- "papers on quantum computing" → CALL searchPapers(query="quantum computing")
+- "hello" → RESPOND directly
+- "tell me more about the first researcher" → RESPOND using previous context
+
+## Agent Loop Behavior:
+1. **Think**: Reason about what the user needs
+2. **Act**: Call tools if needed to get data
+3. **Observe**: Process the tool results
+4. **Repeat**: Call more tools if needed, or provide final answer
+
+## Presenting Researcher Contact Information:
+When you find researchers, you'll receive contact information. Present it in a formatted, helpful way:
+
+**Example Format:**
+Dr. Jane Smith
+Institution: MIT
+📧 Contact: name@university.edu
+🔗 Google Scholar: [link]
+🆔 ORCID: 0000-0002-1234-5678
+🌐 Homepage: [link]
+📊 Citations: 5,234 | Publications: 127
+🔬 Research Areas: Machine Learning, Computer Vision
+
+Include all available contact methods (ORCID, Google Scholar, homepage, Twitter, Wikipedia, Scopus, OpenAlex profile).
+
+You are autonomous - make your own decisions about when to use tools. Be proactive and thorough.` }]
         }
       });
 
@@ -164,8 +204,29 @@ You can call multiple functions if needed. Always provide helpful, accurate resp
 
       // Debug logging
       this.logger.info(`Response object keys: ${Object.keys(response).join(', ')}`);
+
+      // Check for function calls in candidates
+      const candidates = response.candidates || [];
+      this.logger.info(`Number of candidates: ${candidates.length}`);
+
+      if (candidates.length > 0) {
+        const firstCandidate = candidates[0];
+        this.logger.info(`First candidate keys: ${Object.keys(firstCandidate).join(', ')}`);
+
+        if (firstCandidate.content && firstCandidate.content.parts) {
+          this.logger.info(`Number of parts: ${firstCandidate.content.parts.length}`);
+          firstCandidate.content.parts.forEach((part: any, idx: number) => {
+            this.logger.info(`Part ${idx} keys: ${Object.keys(part).join(', ')}`);
+            if (part.functionCall) {
+              this.logger.info(`Part ${idx} has functionCall: ${part.functionCall.name}`);
+            }
+          });
+        }
+      }
+
       this.logger.info(`Response has functionCalls: ${!!response.functionCalls}`);
-      if (response.functionCalls) {
+      this.logger.info(`functionCalls type: ${typeof response.functionCalls}`);
+      if (response.functionCalls && Array.isArray(response.functionCalls)) {
         this.logger.info(`Number of function calls: ${response.functionCalls.length}`);
         this.logger.info(`Function names: ${response.functionCalls.map(fc => fc.name).join(', ')}`);
       }
@@ -185,11 +246,39 @@ You can call multiple functions if needed. Always provide helpful, accurate resp
       let finalText = '';
       let functionCallCount = 0;
 
+      // Extract function calls from response
+      const getFunctionCalls = (resp: any) => {
+        // Try multiple ways to get function calls
+        if (resp.functionCalls && Array.isArray(resp.functionCalls)) {
+          return resp.functionCalls;
+        }
+
+        // Check in candidates
+        if (resp.candidates && resp.candidates[0]?.content?.parts) {
+          const functionCalls = resp.candidates[0].content.parts
+            .filter((part: any) => part.functionCall)
+            .map((part: any) => part.functionCall);
+          if (functionCalls.length > 0) {
+            return functionCalls;
+          }
+        }
+
+        return null;
+      };
+
       // Handle function calls
-      while (response.functionCalls && response.functionCalls.length > 0) {
+      let functionCalls = getFunctionCalls(response);
+
+      if (!functionCalls || functionCalls.length === 0) {
+        this.logger.info('🤖 Agent Decision: Responding directly without tools');
+      } else {
+        this.logger.info(`🤖 Agent Decision: Using ${functionCalls.length} tool(s) to answer`);
+      }
+
+      while (functionCalls && functionCalls.length > 0) {
         functionCallCount++;
         this.logger.separator();
-        const functionCall = response.functionCalls[0];
+        const functionCall = functionCalls[0];
 
         let functionResponse: any = {};
 
@@ -271,17 +360,13 @@ You can call multiple functions if needed. Always provide helpful, accurate resp
           const { institution, topic, maxResults = 20 } = functionCall.args as { institution: string; topic?: string; maxResults?: number };
           this.logger.functionCall('findResearchersByInstitution', { institution, topic, maxResults });
 
-          // Use OpenAlex for institution search
-          const searchQuery = topic
-            ? `${institution} ${topic}`
-            : institution;
-
-          this.logger.apiCall('OpenAlex', `authors?institution=${searchQuery}`);
+          // Use OpenAlex for institution search with topic filter
+          this.logger.apiCall('OpenAlex', `authors?institution=${institution}${topic ? `&topic=${topic}` : ''}`);
           this.logger.apiCall('OpenAlex', `works?institution=${institution}`);
 
           const apiStart = Date.now();
           const [oaAuthors, oaWorks] = await Promise.all([
-            this.openAlex.searchAuthorsByInstitution(searchQuery, maxResults),
+            this.openAlex.searchAuthorsByInstitution(institution, maxResults, topic),
             this.openAlex.searchWorksByInstitution(institution, 10)
           ]);
           const apiTime = Date.now() - apiStart;
@@ -290,10 +375,13 @@ You can call multiple functions if needed. Always provide helpful, accurate resp
           this.logger.result(`OpenAlex Works: ${oaWorks.length} recent papers`);
           this.logger.success(`API calls completed in ${apiTime}ms`);
 
-          const researchers = oaAuthors.map(a => {
-            const affiliation = a.last_known_institution?.display_name || '';
-            const concepts = a.x_concepts?.slice(0, 2).map(c => c.display_name).join(', ') || '';
-            return `${a.display_name} (${affiliation})${concepts ? ` - ${concepts}` : ''}`;
+          // Extract detailed contact information for each researcher
+          const contactInfo = oaAuthors.map(a => this.openAlex.extractContactInfo(a));
+
+          const researchers = contactInfo.map(c => {
+            const affiliation = c.institution || '';
+            const areas = c.researchAreas?.slice(0, 2).join(', ') || '';
+            return `${c.name} (${affiliation})${areas ? ` - ${areas}` : ''}`;
           });
 
           collectedResearchers.push(...researchers);
@@ -301,12 +389,20 @@ You can call multiple functions if needed. Always provide helpful, accurate resp
           functionResponse = {
             institution: institution,
             researchers: researchers.slice(0, maxResults),
-            details: oaAuthors.map(a => ({
-              name: a.display_name,
-              affiliation: a.last_known_institution?.display_name,
-              works: a.works_count,
-              citations: a.cited_by_count,
-              research_areas: a.x_concepts?.slice(0, 3).map(c => c.display_name)
+            contacts: contactInfo.map(c => ({
+              name: c.name,
+              institution: c.institution,
+              email: c.email,
+              orcid: c.orcid,
+              googleScholar: c.googleScholar,
+              homepage: c.homepage,
+              twitter: c.twitter,
+              wikipedia: c.wikipedia,
+              openAlexProfile: c.openAlexProfile,
+              scopusProfile: c.scopusProfile,
+              citations: c.citations,
+              publications: c.publications,
+              researchAreas: c.researchAreas
             })),
             recentWorks: oaWorks.slice(0, 5).map(w => ({
               title: w.title,
@@ -341,6 +437,13 @@ You can call multiple functions if needed. Always provide helpful, accurate resp
         }]);
 
         response = result.response;
+        functionCalls = getFunctionCalls(response);
+
+        if (functionCalls && functionCalls.length > 0) {
+          this.logger.info(`🔄 Agent Decision: Calling another tool (${functionCalls[0].name})`);
+        } else {
+          this.logger.info('✅ Agent Decision: Done with tools, preparing final response');
+        }
       }
 
       // Get final text response

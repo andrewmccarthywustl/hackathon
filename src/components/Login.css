@@ -1,0 +1,248 @@
+/* ==================== LOGIN SIDEBAR ==================== */
+
+.login-sidebar {
+  width: 320px;
+  background: #ffffff;
+  border-left: 1px solid #c9c3b8;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+/* ==================== LOGIN BOX ==================== */
+
+.login-box {
+  padding: 2rem 1.5rem;
+  border-bottom: 1px solid #c9c3b8;
+}
+
+.login-box h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2d2d2d;
+}
+
+.login-subtitle {
+  margin: 0 0 1.5rem 0;
+  font-size: 0.8125rem;
+  color: #6b6558;
+  line-height: 1.4;
+}
+
+/* ==================== FORM FIELDS ==================== */
+
+.form-field {
+  margin-bottom: 1rem;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  font-size: 0.8125rem;
+  color: #2d2d2d;
+}
+
+.form-field input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #c9c3b8;
+  border-radius: 8px;
+  background: #f5f1e8;
+  font-size: 0.875rem;
+  font-family: inherit;
+  transition: all 0.15s ease;
+  color: #2d2d2d;
+}
+
+.form-field input:focus {
+  outline: none;
+  border-color: #2d2d2d;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(45, 45, 45, 0.05);
+}
+
+.form-field input::placeholder {
+  color: #9a9186;
+}
+
+/* ==================== BUTTONS ==================== */
+
+.login-btn,
+.logout-btn,
+.guest-btn {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.login-btn {
+  background: #2d2d2d;
+  color: #f5f1e8;
+  border: none;
+  margin-bottom: 0.75rem;
+}
+
+.login-btn:hover {
+  background: #1a1a1a;
+  transform: translateY(-1px);
+}
+
+.guest-btn {
+  background: transparent;
+  color: #2d2d2d;
+  border: 1px solid #c9c3b8;
+}
+
+.guest-btn:hover {
+  background: #ebe5d8;
+  border-color: #2d2d2d;
+}
+
+.logout-btn {
+  background: #d32f2f;
+  color: white;
+  border: none;
+}
+
+.logout-btn:hover {
+  background: #c62828;
+}
+
+.toggle-mode {
+  width: 100%;
+  padding: 0.5rem;
+  background: transparent;
+  border: none;
+  color: #6b6558;
+  font-size: 0.8125rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.toggle-mode:hover {
+  color: #2d2d2d;
+  text-decoration: underline;
+}
+
+/* ==================== DIVIDER ==================== */
+
+.login-divider {
+  text-align: center;
+  margin: 1rem 0;
+  position: relative;
+}
+
+.login-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #c9c3b8;
+}
+
+.login-divider span {
+  position: relative;
+  background: #ffffff;
+  padding: 0 1rem;
+  color: #9a9186;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ==================== LOGGED IN STATE ==================== */
+
+.login-box.logged-in {
+  text-align: center;
+}
+
+.user-info {
+  margin: 1.5rem 0;
+}
+
+.user-avatar {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 1rem;
+  background: #ebe5d8;
+  color: #2d2d2d;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.welcome-text {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: #6b6558;
+}
+
+.welcome-text strong {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 1rem;
+  color: #2d2d2d;
+  font-weight: 500;
+}
+
+/* ==================== SIDEBAR INFO ==================== */
+
+.sidebar-info {
+  padding: 1.5rem;
+  border-bottom: 1px solid #c9c3b8;
+}
+
+.sidebar-info h4 {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.875rem;
+  color: #2d2d2d;
+  font-weight: 600;
+}
+
+.sidebar-info p {
+  margin: 0 0 1.5rem 0;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: #6b6558;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #c9c3b8;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-item strong {
+  display: block;
+  font-size: 1.25rem;
+  color: #2d2d2d;
+  font-weight: 600;
+}
+
+.stat-item span {
+  display: block;
+  font-size: 0.6875rem;
+  color: #6b6558;
+  margin-top: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}

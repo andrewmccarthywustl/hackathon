@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import type { ChatMessage, ChatResponse, ArxivPaper } from '../types';
 import PaperCard from './PaperCard';
+import './Chat.css';
 
 const API_BASE = '/api';
 
