@@ -20,7 +20,7 @@ function App() {
     <div className="app">
       <header className="app-header">
         <div className="header-left">
-          <h1 className="app-title">Research Chronicle</h1>
+          <h1 className="app-title">Synapse AI</h1>
           <nav className="app-nav">
             <button
               className={`nav-btn ${!showProfile ? 'active' : ''}`}

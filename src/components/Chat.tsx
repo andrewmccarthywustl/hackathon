@@ -19,6 +19,7 @@ export default function Chat() {
   const [loading, setLoading] = useState(false);
   const [currentPapers, setCurrentPapers] = useState<ArxivPaper[]>([]);
   const [currentResearchers, setCurrentResearchers] = useState<string[]>([]);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -99,8 +100,51 @@ export default function Chat() {
     }
   };
 
+  const hasSidebarContent = currentPapers.length > 0 || currentResearchers.length > 0;
+
   return (
     <div className="chat-wrapper">
+      {/* Left Sidebar */}
+      {hasSidebarContent && (
+        <div className={`results-sidebar left ${sidebarCollapsed ? 'collapsed' : ''}`}>
+          <button
+            className="sidebar-toggle"
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            {sidebarCollapsed ? '→' : '←'}
+          </button>
+
+          {!sidebarCollapsed && (
+            <>
+              {currentPapers.length > 0 && (
+                <>
+                  <h3>📄 Related Papers ({currentPapers.length})</h3>
+                  <div className="papers-list">
+                    {currentPapers.slice(0, 10).map(paper => (
+                      <PaperCard key={paper.id} paper={paper} />
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {currentResearchers.length > 0 && (
+                <>
+                  <h3>👥 Researchers ({currentResearchers.length})</h3>
+                  <div className="researchers-list">
+                    {currentResearchers.map((researcher, idx) => (
+                      <div key={idx} className="researcher-item">
+                        {researcher}
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
       <div className="chat-container">
         <div className="chat-messages">
           {messages.map((msg, idx) => (
@@ -138,32 +182,6 @@ export default function Chat() {
           </button>
         </div>
       </div>
-
-      {/* Show papers in sidebar if available */}
-      {currentPapers.length > 0 && (
-        <div className="results-sidebar">
-          <h3>📄 Related Papers ({currentPapers.length})</h3>
-          <div className="papers-list">
-            {currentPapers.slice(0, 10).map(paper => (
-              <PaperCard key={paper.id} paper={paper} />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Show researchers if available */}
-      {currentResearchers.length > 0 && (
-        <div className="results-sidebar">
-          <h3>👥 Researchers ({currentResearchers.length})</h3>
-          <div className="researchers-list">
-            {currentResearchers.map((researcher, idx) => (
-              <div key={idx} className="researcher-item">
-                {researcher}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
