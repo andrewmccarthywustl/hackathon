@@ -69,7 +69,7 @@ Update your frontend to point to the Railway backend:
 
 Railway uses these settings (already configured):
 
-- **Build Command:** `npm run build:server`
+- **Build Command:** `npm run build` (runs `npm run build:server` and Vite build, so `server/dist` is ready before the container boots)
 - **Start Command:** `npm run start:server`
 - **Node Version:** Detected from package.json
 
