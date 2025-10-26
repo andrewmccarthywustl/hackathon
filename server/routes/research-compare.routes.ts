@@ -29,7 +29,7 @@ const upload = multer({
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB limit
   },
-  fileFilter: (req, file, cb) => {
+  fileFilter: (_req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
     const allowedTypes = [
       'application/pdf',
       'text/plain',
@@ -242,7 +242,7 @@ Please search for relevant papers and provide a comprehensive analysis with thes
         console.error('Research comparison error:', error);
         sendError(error instanceof Error ? error.message : 'An error occurred during analysis');
       }
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Research comparison error:', error);
 
       if (error instanceof multer.MulterError) {
@@ -423,7 +423,7 @@ Please search for relevant papers and provide a comprehensive analysis with thes
         similarPapers: result.papers || [],
         metrics,
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Research comparison error:', error);
 
       if (error instanceof multer.MulterError) {
