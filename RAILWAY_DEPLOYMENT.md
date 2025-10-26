@@ -41,6 +41,10 @@ Add these environment variables in Railway dashboard:
 - `PORT` - Railway sets this automatically, don't override
 - `NODE_ENV` - Set to "production"
 
+### 3.1 Pin Node.js 20
+
+Supabase's SDK now requires Node.js 20+. Railway builds use Nixpacks, so this repo ships `nixpacks.toml` with `NIXPACKS_NODE_VERSION = "20"`. If you override variables in the Railway UI, make sure you keep that value (or add the variable manually) so deployments continue using Node 20.
+
 ### 4. Deploy
 
 1. Railway will automatically build and deploy
