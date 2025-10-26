@@ -166,6 +166,7 @@ export function ResearcherOnboarding({ googleEmail, googleName, onComplete }: Re
                   value={profile.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
                   placeholder="Your full name"
+                  autoFocus
                 />
               </div>
 
@@ -188,7 +189,6 @@ export function ResearcherOnboarding({ googleEmail, googleName, onComplete }: Re
                   value={profile.institution}
                   onChange={(e) => handleInputChange('institution', e.target.value)}
                   placeholder="Your university or research institution"
-                  autoFocus
                 />
               </div>
 
