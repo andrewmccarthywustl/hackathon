@@ -73,7 +73,7 @@ app.get('/', (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`\n🚀 Researcher Chat API running on http://localhost:${PORT}`);
-  console.log(`📚 API endpoints available at http://localhost:${PORT}/api\n`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`\n🚀 Researcher Chat API running on http://0.0.0.0:${PORT}`);
+  console.log(`📚 API endpoints available at http://0.0.0.0:${PORT}/api\n`);
 });
