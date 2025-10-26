@@ -20,8 +20,8 @@ const AVATAR_ICONS = [
 
 export function ResearcherOnboarding({ googleEmail, googleName, onComplete }: ResearcherOnboardingProps) {
   const [profile, setProfile] = useState<Partial<ResearcherProfile>>({
-    name: googleName,
-    email: googleEmail,
+    name: '',
+    email: '',
     institution: '',
     department: '',
     researchInterests: [],
@@ -195,7 +195,6 @@ export function ResearcherOnboarding({ googleEmail, googleName, onComplete }: Re
                   onChange={(e) => handleInputChange('name', e.target.value)}
                   placeholder="Your full name"
                 />
-                <p className="help-text">You can edit this if your Google name differs from your preferred name</p>
               </div>
 
               <div className="form-group">
@@ -206,7 +205,6 @@ export function ResearcherOnboarding({ googleEmail, googleName, onComplete }: Re
                   onChange={(e) => handleInputChange('email', e.target.value)}
                   placeholder="your.email@institution.edu"
                 />
-                <p className="help-text">You can use a different email if preferred</p>
               </div>
 
               <div className="form-group">
