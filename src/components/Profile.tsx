@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { ResearcherProfile } from '../types/profile';
+import { apiUrl } from '../utils/api';
 import './Profile.css';
 
 export function Profile() {
@@ -59,7 +60,7 @@ export function Profile() {
     };
 
     try {
-      const response = await fetch('/api/profile', {
+      const response = await fetch(apiUrl('/api/profile'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

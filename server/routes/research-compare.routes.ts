@@ -1,9 +1,8 @@
 import { Router, Request, Response } from 'express';
 import multer from 'multer';
-import path from 'node:path';
-import { promises as fs } from 'node:fs';
-import { fileURLToPath } from 'node:url';
 import { AIRouter } from '../services/ai/ai-router';
+import { getSupabaseClient, SUPABASE_TABLES } from '../services/supabase.service.js';
+import type { ArxivPaper } from '../types';
 
 interface ParsedMetrics {
   noveltyScore: number;
@@ -16,12 +15,13 @@ interface SummarySnapshot {
   generatedAt: string;
   summary: string;
   metrics: ParsedMetrics;
+  analysis: string;
+  similarPapers: ArxivPaper[];
+  inputPreview?: string;
 }
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const SUMMARY_OUTPUT_DIR = path.resolve(__dirname, '../data/research-compare');
-const SUMMARY_OUTPUT_FILE = path.join(SUMMARY_OUTPUT_DIR, 'latest-summary.json');
+const supabase = getSupabaseClient();
+const SNAPSHOTS_TABLE = SUPABASE_TABLES.researchCompareSnapshots;
 
 // Configure multer for file uploads
 const storage = multer.memoryStorage();
@@ -197,6 +197,9 @@ Please search for relevant papers and provide a comprehensive analysis with thes
         generatedAt: new Date().toISOString(),
         summary,
         metrics,
+        analysis: analysisText,
+        similarPapers: result.papers || [],
+        inputPreview: researchContent.slice(0, 500)
       });
 
       // Format the response
@@ -225,8 +228,20 @@ Please search for relevant papers and provide a comprehensive analysis with thes
 
 async function persistSummarySnapshot(snapshot: SummarySnapshot): Promise<void> {
   try {
-    await fs.mkdir(SUMMARY_OUTPUT_DIR, { recursive: true });
-    await fs.writeFile(SUMMARY_OUTPUT_FILE, JSON.stringify(snapshot, null, 2), 'utf-8');
+    const { error } = await supabase
+      .from(SNAPSHOTS_TABLE)
+      .insert({
+        generated_at: snapshot.generatedAt,
+        summary: snapshot.summary,
+        metrics: snapshot.metrics,
+        analysis: snapshot.analysis,
+        similar_papers: snapshot.similarPapers,
+        input_preview: snapshot.inputPreview ?? null
+      });
+
+    if (error) {
+      console.warn('Unable to persist research summary snapshot', error);
+    }
   } catch (error) {
     console.warn('Unable to persist research summary snapshot', error);
   }

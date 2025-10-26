@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { ResearcherProfile } from '../types/profile';
+import { apiUrl } from '../utils/api';
 import './ResearcherOnboarding.css';
 
 interface ResearcherOnboardingProps {
@@ -108,7 +109,7 @@ export function ResearcherOnboarding({ googleEmail, googleName, onComplete }: Re
     setIsSaving(true);
 
     try {
-      const response = await fetch('/api/profile', {
+      const response = await fetch(apiUrl('/api/profile'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import type { ArxivPaper } from '../types';
 import PaperCard from './PaperCard';
-
-const API_BASE = '/api';
+import { apiUrl } from '../utils/api';
 
 export default function FindResearchers() {
   const [interests, setInterests] = useState('');
@@ -22,7 +21,7 @@ export default function FindResearchers() {
     const keywordsList = keywords.split(',').map(s => s.trim()).filter(Boolean);
 
     try {
-      const response = await fetch(`${API_BASE}/find-researchers`, {
+      const response = await fetch(apiUrl('/api/find-researchers'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

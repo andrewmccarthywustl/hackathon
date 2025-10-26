@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import type { ArxivPaper } from '../types';
 import PaperCard from './PaperCard';
+import { apiUrl } from '../utils/api';
 import './ResearchCompare.css';
 
 const LOADING_PHASES = [
@@ -212,7 +213,7 @@ export function ResearchCompare() {
       const formData = new FormData();
       formData.append('text', researchText);
 
-      const response = await fetch('http://localhost:3001/api/compare-research', {
+      const response = await fetch(apiUrl('/api/compare-research'), {
         method: 'POST',
         body: formData,
       });

@@ -2,14 +2,13 @@ import { useState, useRef, useEffect, useContext, useMemo } from 'react';
 import type { ChatMessage, ChatResponse, ArxivPaper } from '../types';
 import type { SavedConversation } from '../types/chat-history';
 import { chatStorage } from '../utils/chatStorage';
+import { apiUrl } from '../utils/api';
 import { ChatHistory } from './ChatHistory';
 import PaperCard from './PaperCard';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { ProfileContext } from '../context/ProfileContext';
 import './Chat.css';
-
-const API_BASE = '/api';
 
 export default function Chat() {
   const { profile } = useContext(ProfileContext);
@@ -134,7 +133,7 @@ export default function Chat() {
     setInput('');
 
     try {
-      const response = await fetch(`${API_BASE}/chat`, {
+      const response = await fetch(apiUrl('/api/chat'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

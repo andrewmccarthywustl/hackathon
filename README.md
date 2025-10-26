@@ -31,6 +31,7 @@ A React + TypeScript application that helps researchers connect with others in t
 - Semantic Scholar API for academic data
 - OpenAlex API for institutional searches
 - ReAct (Reasoning + Acting) agent framework
+- Supabase Postgres for persistent cloud storage
 
 ## Quick Start
 
@@ -84,6 +85,59 @@ AI_PROVIDER=claude
 ANTHROPIC_API_KEY=your_actual_api_key_here
 CLAUDE_MODEL=claude-sonnet-4-5
 ```
+
+### 2.1 Configure Supabase Storage
+
+1. [Create a Supabase project](https://supabase.com/dashboard/projects) if you don't already have one.
+2. In the SQL Editor, run the following scripts to create the required tables:
+
+```sql
+-- Stores researcher onboarding + profile submissions
+create table if not exists public.researcher_profiles (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  email text not null,
+  institution text not null,
+  department text,
+  research_interests text[] not null default '{}',
+  bio text,
+  homepage text,
+  orcid text,
+  google_scholar text,
+  avatar_icon text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create unique index if not exists researcher_profiles_email_idx on public.researcher_profiles (email);
+
+-- Persists research compare summaries + metrics
+create table if not exists public.research_compare_snapshots (
+  id uuid primary key default gen_random_uuid(),
+  generated_at timestamptz not null default now(),
+  summary text,
+  metrics jsonb not null,
+  analysis text,
+  similar_papers jsonb,
+  input_preview text
+);
+```
+
+3. In **Project Settings → API**, copy your `Project URL` and `service_role` key.
+4. Update `.env` with the new values:
+
+```env
+SUPABASE_URL=https://your-project-id.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+# Optional overrides (defaults shown)
+SUPABASE_PROFILES_TABLE=researcher_profiles
+SUPABASE_COMPARE_TABLE=research_compare_snapshots
+
+# Frontend → backend base URL (set to your deployed API origin in production)
+VITE_API_BASE_URL=http://localhost:3001
+```
+
+> 💡 The backend uses the `service_role` key, so keep it on the server side only. Enable Row Level Security (RLS) and rely on the service role for trusted access.
 
 ### 3. Install Dependencies
 
@@ -191,6 +245,17 @@ Get information about the current AI provider.
   "model": "gpt-4o"
 }
 ```
+
+### POST /api/profile
+Persists a researcher profile to Supabase and returns the saved record.
+
+**Requires:** `name`, `email`, `institution`. Optional fields include `department`, `researchInterests`, `bio`, `homepage`, `orcid`, `googleScholar`, `avatarIcon`.
+
+### GET /api/profiles
+Lists all stored researcher profiles ordered by `createdAt`. Useful for admin tooling or analytics.
+
+### POST /api/compare-research
+Accepts raw research text or an uploaded file (`text/plain`, `pdf`, or `docx`), generates novelty + overlap metrics, and stores the summary + metrics in Supabase for auditing.
 
 ## Scripts
 

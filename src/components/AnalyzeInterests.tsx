@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import type { ArxivPaper } from '../types';
 import PaperCard from './PaperCard';
-
-const API_BASE = '/api';
+import { apiUrl } from '../utils/api';
 
 export default function AnalyzeInterests() {
   const [interests, setInterests] = useState('');
@@ -20,7 +19,7 @@ export default function AnalyzeInterests() {
     const interestsList = interests.split(',').map(s => s.trim()).filter(Boolean);
 
     try {
-      const response = await fetch(`${API_BASE}/analyze-interests`, {
+      const response = await fetch(apiUrl('/api/analyze-interests'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ interests: interestsList })
