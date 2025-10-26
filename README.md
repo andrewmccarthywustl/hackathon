@@ -1,6 +1,6 @@
 # Synapse AI
 
-A React + TypeScript application that helps researchers connect with others in their field, explore research topics, and get answers to questions using multiple academic APIs and AI providers.
+A React + TypeScript application that helps researchers connect with others in their field, explore research topics, and get answers to questions using multiple academic APIs and AI providers. Learned a lot making this as a team.
 
 ## Features
 
