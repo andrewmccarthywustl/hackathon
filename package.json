@@ -9,6 +9,7 @@
     "dev:all": "concurrently \"npm run dev\" \"npm run dev:server\"",
     "build": "npm run build:server && vite build",
     "build:server": "tsc -p server/tsconfig.json",
+    "start": "node server/dist/index.js",
     "start:server": "node server/dist/index.js",
     "start:server:dev": "tsx server/index.ts",
     "lint": "eslint .",
