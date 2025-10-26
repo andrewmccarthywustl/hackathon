@@ -20,7 +20,6 @@ interface SummarySnapshot {
   inputPreview?: string;
 }
 
-const supabase = getSupabaseClient();
 const SNAPSHOTS_TABLE = SUPABASE_TABLES.researchCompareSnapshots;
 
 // Configure multer for file uploads
@@ -228,6 +227,9 @@ Please search for relevant papers and provide a comprehensive analysis with thes
 
 async function persistSummarySnapshot(snapshot: SummarySnapshot): Promise<void> {
   try {
+    // Get Supabase client (initialized on demand)
+    const supabase = getSupabaseClient();
+
     const { error } = await supabase
       .from(SNAPSHOTS_TABLE)
       .insert({

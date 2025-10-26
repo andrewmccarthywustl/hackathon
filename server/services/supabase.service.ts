@@ -23,12 +23,26 @@ export function getSupabaseClient(): SupabaseClient {
   const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 
   if (!supabaseUrl) {
+    console.error('Environment variables:', {
+      hasSupabaseUrl: !!process.env.SUPABASE_URL,
+      hasServiceRoleKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      hasAnonKey: !!process.env.SUPABASE_ANON_KEY,
+      allEnvKeys: Object.keys(process.env).filter(k => k.includes('SUPABASE'))
+    });
     throw new Error('SUPABASE_URL is not set. Please add it to your environment variables.');
   }
 
   if (!supabaseServiceRoleKey) {
+    console.error('Environment variables:', {
+      hasSupabaseUrl: !!process.env.SUPABASE_URL,
+      hasServiceRoleKey: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+      hasAnonKey: !!process.env.SUPABASE_ANON_KEY,
+      allEnvKeys: Object.keys(process.env).filter(k => k.includes('SUPABASE'))
+    });
     throw new Error('SUPABASE_SERVICE_ROLE_KEY (or SUPABASE_ANON_KEY) is not set.');
   }
+
+  console.log('Creating Supabase client with URL:', supabaseUrl);
 
   cachedClient = createClient(supabaseUrl, supabaseServiceRoleKey, {
     auth: { persistSession: false },

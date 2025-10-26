@@ -35,7 +35,6 @@ interface ProfileResponse {
 }
 
 const logger = new Logger('ProfileRouter');
-const supabase = getSupabaseClient();
 
 const PROFILES_TABLE = SUPABASE_TABLES.profiles;
 
@@ -82,6 +81,9 @@ export function createProfileRouter(): Router {
       }
 
       const timestamp = new Date().toISOString();
+
+      // Get Supabase client (initialized on demand)
+      const supabase = getSupabaseClient();
 
       const { data, error } = await supabase
         .from(PROFILES_TABLE)
@@ -135,6 +137,9 @@ export function createProfileRouter(): Router {
   // GET /api/profiles - List all saved profiles
   router.get('/profiles', async (req: Request, res: Response) => {
     try {
+      // Get Supabase client (initialized on demand)
+      const supabase = getSupabaseClient();
+
       const { data, error } = await supabase
         .from(PROFILES_TABLE)
         .select('*')
