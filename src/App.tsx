@@ -9,6 +9,7 @@ import { LandingPage } from './components/LandingPage';
 import { ResearcherOnboarding } from './components/ResearcherOnboarding';
 import { ProfileDropdown } from './components/ProfileDropdown';
 import type { ResearcherProfile } from './types/profile';
+import { ProfileContext } from './context/ProfileContext';
 import './App.css';
 
 type ViewType = 'hub' | 'chat' | 'discover' | 'saved' | 'compare';
@@ -90,8 +91,9 @@ function App() {
   };
 
   const mainApp = (
-    <div className="app app-shell">
-      <header className="app-header">
+    <ProfileContext.Provider value={{ profile: currentProfile }}>
+      <div className="app app-shell">
+        <header className="app-header">
         <div className="header-left">
           <h1
             className="app-title"
@@ -136,8 +138,8 @@ function App() {
         />
       </header>
 
-      <div className="app-main">
-        <div className="content-wrapper">
+        <div className="app-main">
+          <div className="content-wrapper">
           {currentView === 'hub' && (
             <HubOverview onSelect={navigateToView} />
           )}
@@ -145,9 +147,10 @@ function App() {
           {currentView === 'compare' && <ResearchCompare />}
           {currentView === 'discover' && <Discover />}
           {currentView === 'saved' && <SavedPapers />}
+          </div>
         </div>
       </div>
-    </div>
+    </ProfileContext.Provider>
   );
 
   return (

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useContext, useMemo } from 'react';
 import type { ChatMessage, ChatResponse, ArxivPaper } from '../types';
 import type { SavedConversation } from '../types/chat-history';
 import { chatStorage } from '../utils/chatStorage';
@@ -6,20 +6,25 @@ import { ChatHistory } from './ChatHistory';
 import PaperCard from './PaperCard';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { ProfileContext } from '../context/ProfileContext';
 import './Chat.css';
 
 const API_BASE = '/api';
 
-const DEFAULT_MESSAGE: ChatMessage = {
-  role: 'assistant',
-  content: "Hello! I'm your research assistant. I can help you:\n\n• Find and discuss research papers\n• Discover researchers working in specific fields\n• Analyze research trends and opportunities\n\nJust ask me anything! For example:\n- \"Show me recent papers on quantum computing\"\n- \"Who are the leading researchers in machine learning?\"\n- \"What are the trends in neuroscience?\"",
-  timestamp: new Date()
-};
-
 export default function Chat() {
+  const { profile } = useContext(ProfileContext);
+  const interestFocus = profile?.researchInterests?.[0] ?? 'emerging research areas';
+  const institutionFocus = profile?.institution ?? 'leading labs';
+
+  const examplePrompts = useMemo(() => [
+    `Show me top ${interestFocus.toLowerCase()} papers published this year.`,
+    `Who are the most cited ${interestFocus.toLowerCase()} researchers right now?`,
+    `Which ${institutionFocus} labs are doing interesting work related to ${interestFocus.toLowerCase()}?`
+  ], [interestFocus, institutionFocus]);
+
   const [conversations, setConversations] = useState<SavedConversation[]>([]);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
-  const [messages, setMessages] = useState<ChatMessage[]>([DEFAULT_MESSAGE]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [currentPapers, setCurrentPapers] = useState<ArxivPaper[]>([]);
@@ -36,7 +41,7 @@ export default function Chat() {
 
   // Auto-save current conversation
   useEffect(() => {
-    if (currentConversationId && messages.length > 1) {
+    if (currentConversationId && messages.length > 0) {
       const conversation: SavedConversation = {
         id: currentConversationId,
         title: conversations.find(c => c.id === currentConversationId)?.title ||
@@ -64,7 +69,7 @@ export default function Chat() {
 
   const startNewConversation = () => {
     setCurrentConversationId(chatStorage.generateId());
-    setMessages([DEFAULT_MESSAGE]);
+    setMessages([]);
     setCurrentPapers([]);
     setCurrentResearchers([]);
   };
@@ -90,29 +95,50 @@ export default function Chat() {
   };
 
   const sendMessage = async () => {
-    if (!input.trim() || loading) return;
+    if (!input.trim()) return;
+    await sendPrompt(input.trim());
+  };
 
-    // Create a new conversation if we don't have one
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
+
+  const filteredPapers = currentPapers.filter((paper) => {
+    if (!papersSearchTerm.trim()) return true;
+    const term = papersSearchTerm.toLowerCase();
+    return (
+      paper.title.toLowerCase().includes(term) ||
+      paper.authors.some(author => author.toLowerCase().includes(term)) ||
+      paper.categories.some(category => category.toLowerCase().includes(term))
+    );
+  });
+
+  const sendPrompt = async (prompt: string) => {
+    if (!prompt.trim() || loading) return;
+
     if (!currentConversationId) {
       setCurrentConversationId(chatStorage.generateId());
     }
 
     const userMessage: ChatMessage = {
       role: 'user',
-      content: input,
+      content: prompt,
       timestamp: new Date()
     };
 
     setMessages(prev => [...prev, userMessage]);
-    setInput('');
     setLoading(true);
+    setInput('');
 
     try {
       const response = await fetch(`${API_BASE}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: input,
+          message: prompt,
           context: messages.slice(-5)
         })
       });
@@ -155,22 +181,9 @@ export default function Chat() {
     setLoading(false);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
+  const handleExampleClick = (prompt: string) => {
+    sendPrompt(prompt);
   };
-
-  const filteredPapers = currentPapers.filter((paper) => {
-    if (!papersSearchTerm.trim()) return true;
-    const term = papersSearchTerm.toLowerCase();
-    return (
-      paper.title.toLowerCase().includes(term) ||
-      paper.authors.some(author => author.toLowerCase().includes(term)) ||
-      paper.categories.some(category => category.toLowerCase().includes(term))
-    );
-  });
 
   return (
     <div className="chat-wrapper">
@@ -185,6 +198,20 @@ export default function Chat() {
 
       {/* Main Chat Area */}
       <div className="chat-main-area">
+        {messages.length === 0 && (
+          <div className="prompt-buttons">
+            {examplePrompts.map((prompt) => (
+              <button
+                key={prompt}
+                className="prompt-btn"
+                onClick={() => handleExampleClick(prompt)}
+                disabled={loading}
+              >
+                {prompt}
+              </button>
+            ))}
+          </div>
+        )}
         {currentPapers.length > 0 && (
           <button
             className="papers-toggle"
