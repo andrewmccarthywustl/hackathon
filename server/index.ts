@@ -27,7 +27,7 @@ app.options('*', cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Validate AI configuration on startup
+// Validate AI configuration on startup (warn but don't exit on error)
 try {
   const aiConfig = loadAIConfig();
   validateAIConfig(aiConfig);
@@ -40,8 +40,8 @@ try {
     console.log(`   Model: ${aiConfig.claude?.model}`);
   }
 } catch (error) {
-  console.error('❌ AI Configuration Error:', error);
-  process.exit(1);
+  console.error('⚠️  AI Configuration Error (server will start anyway):', error);
+  console.error('⚠️  AI features may not work until environment variables are configured');
 }
 
 // Routes
