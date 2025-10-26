@@ -35,5 +35,6 @@
 # Specific function configuration for research compare endpoint
 [[functions]]
   path = "/.netlify/functions/api"
-  # Increase timeout for AI processing (max 26 seconds on free tier)
-  timeout = 26
+  # Increase timeout for AI processing (requires Netlify Pro for >26 seconds)
+  # Free tier max is 26 seconds, Pro tier allows up to 100 seconds
+  timeout = 60

@@ -28,8 +28,8 @@ export default function Chat() {
   const [loading, setLoading] = useState(false);
   const [currentPapers, setCurrentPapers] = useState<ArxivPaper[]>([]);
   const [currentResearchers, setCurrentResearchers] = useState<string[]>([]);
-  const [isPapersDrawerOpen, setIsPapersDrawerOpen] = useState(false);
-  const [papersSearchTerm, setPapersSearchTerm] = useState('');
+  const [sidebarView, setSidebarView] = useState<'papers' | 'people'>('papers');
+  const [searchTerm, setSearchTerm] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Load conversations on mount
@@ -106,13 +106,19 @@ export default function Chat() {
   };
 
   const filteredPapers = currentPapers.filter((paper) => {
-    if (!papersSearchTerm.trim()) return true;
-    const term = papersSearchTerm.toLowerCase();
+    if (!searchTerm.trim()) return true;
+    const term = searchTerm.toLowerCase();
     return (
       paper.title.toLowerCase().includes(term) ||
       paper.authors.some(author => author.toLowerCase().includes(term)) ||
       paper.categories.some(category => category.toLowerCase().includes(term))
     );
+  });
+
+  const filteredResearchers = currentResearchers.filter((researcher) => {
+    if (!searchTerm.trim()) return true;
+    const term = searchTerm.toLowerCase();
+    return researcher.toLowerCase().includes(term);
   });
 
   const sendPrompt = async (prompt: string) => {
@@ -211,59 +217,6 @@ export default function Chat() {
             ))}
           </div>
         )}
-        {currentPapers.length > 0 && (
-          <button
-            className="papers-toggle"
-            onClick={() => setIsPapersDrawerOpen(true)}
-            aria-label="Show related papers"
-          >
-            📄
-          </button>
-        )}
-
-        {isPapersDrawerOpen && (
-          <div
-            className="papers-drawer-overlay"
-            role="dialog"
-            aria-label="Related papers"
-            onClick={() => setIsPapersDrawerOpen(false)}
-          >
-            <div className="papers-drawer" onClick={(e) => e.stopPropagation()}>
-              <div className="papers-drawer-header">
-                <div>
-                  <p className="papers-drawer-label">Related Papers</p>
-                  <h3>{filteredPapers.length} result{filteredPapers.length !== 1 ? 's' : ''}</h3>
-                </div>
-                <button
-                  className="papers-drawer-close"
-                  onClick={() => setIsPapersDrawerOpen(false)}
-                  aria-label="Close papers list"
-                >
-                  ×
-                </button>
-              </div>
-              {currentPapers.length > 4 && (
-                <div className="papers-search-box">
-                  <input
-                    type="text"
-                    placeholder="Search title, author, or category..."
-                    value={papersSearchTerm}
-                    onChange={(e) => setPapersSearchTerm(e.target.value)}
-                  />
-                </div>
-              )}
-              <div className="papers-drawer-content">
-                {filteredPapers.length === 0 ? (
-                  <p className="papers-empty">No papers match your search.</p>
-                ) : (
-                  filteredPapers.map((paper) => (
-                    <PaperCard key={paper.id} paper={paper} />
-                  ))
-                )}
-              </div>
-            </div>
-          </div>
-        )}
 
         <div className="chat-container">
           <div className="chat-messages">
@@ -302,8 +255,68 @@ export default function Chat() {
             </button>
           </div>
         </div>
-
       </div>
+
+      {/* Right Sidebar for Papers/People */}
+      {(currentPapers.length > 0 || currentResearchers.length > 0) && (
+        <div className="right-sidebar">
+          {/* Toggle between Papers and People */}
+          <div className="sidebar-toggle">
+            <button
+              className={`toggle-btn ${sidebarView === 'papers' ? 'active' : ''}`}
+              onClick={() => setSidebarView('papers')}
+            >
+              Papers ({currentPapers.length})
+            </button>
+            <button
+              className={`toggle-btn ${sidebarView === 'people' ? 'active' : ''}`}
+              onClick={() => setSidebarView('people')}
+            >
+              People ({currentResearchers.length})
+            </button>
+          </div>
+
+          {/* Search Input */}
+          <div className="sidebar-search">
+            <input
+              type="text"
+              placeholder={`Search ${sidebarView}...`}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          {/* Content Area */}
+          <div className="sidebar-content">
+            {sidebarView === 'papers' ? (
+              filteredPapers.length === 0 ? (
+                <p className="sidebar-empty">
+                  {searchTerm ? 'No papers match your search.' : 'No papers available.'}
+                </p>
+              ) : (
+                filteredPapers.map((paper) => (
+                  <PaperCard key={paper.id} paper={paper} />
+                ))
+              )
+            ) : (
+              filteredResearchers.length === 0 ? (
+                <p className="sidebar-empty">
+                  {searchTerm ? 'No people match your search.' : 'No researchers found.'}
+                </p>
+              ) : (
+                <div className="researchers-list">
+                  {filteredResearchers.map((researcher, idx) => (
+                    <div key={idx} className="researcher-item">
+                      <div className="researcher-avatar">👤</div>
+                      <div className="researcher-name">{researcher}</div>
+                    </div>
+                  ))}
+                </div>
+              )
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
