@@ -56,12 +56,12 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
 These variables are accessible in your frontend code:
 
 ```
-VITE_API_BASE_URL=
+VITE_API_BASE_URL=https://your-railway-app.up.railway.app
 VITE_CHATKIT_WORKFLOW_ID=your_workflow_id_here
 VITE_GOOGLE_CLIENT_ID=your_google_client_id.apps.googleusercontent.com
 ```
 
-**Note**: Leave `VITE_API_BASE_URL` empty for production. Netlify will automatically route `/api/*` requests to your serverless functions.
+**Note**: Set `VITE_API_BASE_URL` to your publicly accessible Railway backend so the frontend bypasses Netlify Function limits. Only set it to `relative` if you explicitly want Netlify to proxy `/api/*` on the same origin.
 
 #### Optional Configuration
 
@@ -171,7 +171,7 @@ These are only accessible in Netlify Functions and never exposed to the browser:
 ### Frontend Variables (Browser-accessible)
 These are embedded in your built frontend and accessible in the browser:
 
-- `VITE_API_BASE_URL` (leave empty for production)
+- `VITE_API_BASE_URL` (set to your Railway URL, or `relative` to force Netlify Functions)
 - `VITE_CHATKIT_WORKFLOW_ID`
 - `VITE_GOOGLE_CLIENT_ID`
 
@@ -184,16 +184,9 @@ This means the Netlify Function is taking too long to respond (max 26 seconds on
 
 **For Research Compare endpoint:**
 - AI analysis can take 20-30 seconds for complex research queries
-- The timeout is set to maximum (26 seconds on free tier)
-- If you frequently hit timeouts, consider:
-  - Upgrading to Netlify Pro (timeout up to 100 seconds)
-  - Using Gemini Flash model (faster than Claude/GPT-4)
-  - Simplifying the research description
+- Netlify Functions time out after ~26 seconds on the free tier
 
-**Solutions:**
-1. Check function logs to see how long requests are taking
-2. Switch AI provider in environment variables to `AI_PROVIDER=gemini`
-3. Upgrade to Netlify Pro for longer timeouts
+**Best fix:** Point `VITE_API_BASE_URL` at your Railway deployment so the frontend bypasses Netlify Functions entirely. If you must stay on Netlify Functions, keep requests small or upgrade to Netlify Pro for longer timeouts.
 
 ### 502 Bad Gateway Error
 This typically means the Netlify Function is crashing. To debug:

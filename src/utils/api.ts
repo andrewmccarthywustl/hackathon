@@ -8,8 +8,12 @@ const rawBaseUrl = typeof import.meta.env.VITE_API_BASE_URL === 'string'
   : undefined;
 
 const resolvedBaseUrl = rawBaseUrl?.trim();
-const effectiveBaseUrl =
-  resolvedBaseUrl !== undefined
+const normalizedPreference = resolvedBaseUrl?.toLowerCase();
+const wantsRelative = normalizedPreference === 'relative' || normalizedPreference === 'same-origin';
+
+const effectiveBaseUrl = wantsRelative
+  ? ''
+  : (resolvedBaseUrl && resolvedBaseUrl.length > 0)
     ? resolvedBaseUrl
     : fallbackBaseUrl;
 

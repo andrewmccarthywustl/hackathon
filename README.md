@@ -133,7 +133,10 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 SUPABASE_PROFILES_TABLE=researcher_profiles
 SUPABASE_COMPARE_TABLE=research_compare_snapshots
 
-# Frontend → backend base URL (set to your deployed API origin in production)
+# Frontend → backend base URL
+# - Dev: http://localhost:3001
+# - Prod: leave unset to default to the Railway deployment
+# - Set to "relative" only if you want Netlify Functions to handle /api
 VITE_API_BASE_URL=http://localhost:3001
 ```
 
