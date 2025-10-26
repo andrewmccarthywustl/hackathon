@@ -1,4 +1,4 @@
-# Research Chronicle
+# Synapse AI
 
 A React + TypeScript application that helps researchers connect with others in their field, explore research topics, and get answers to questions using multiple academic APIs and AI providers.
 
