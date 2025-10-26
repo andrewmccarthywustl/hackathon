@@ -13,15 +13,35 @@ dotenv.config();
 const app: Express = express();
 const PORT = parseInt(process.env.PORT || '3001', 10);
 
-// Middleware - Allow all origins for now (can restrict later)
+// CORS configuration - Allow Netlify frontend and local development
+const allowedOrigins = [
+  'https://synapse-hifi.netlify.app',
+  'http://localhost:5173',
+  'http://localhost:3000',
+  'http://127.0.0.1:5173',
+  'http://127.0.0.1:3000'
+];
+
 app.use(cors({
-  origin: true, // Allow all origins
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else {
+      // In production, still allow all origins for now (can restrict later)
+      callback(null, true);
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  exposedHeaders: ['Content-Type', 'Authorization'],
+  maxAge: 86400 // Cache preflight for 24 hours
 }));
 
-// Handle preflight requests
+// Handle preflight requests explicitly
 app.options('*', cors());
 
 app.use(express.json({ limit: '10mb' }));
