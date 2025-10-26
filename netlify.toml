@@ -9,6 +9,8 @@
 [build.environment]
   # Node version
   NODE_VERSION = "20"
+  # Don't fail on warnings
+  NODE_OPTIONS = "--max-old-space-size=4096"
 
 # Redirect all API requests to serverless functions
 [[redirects]]
@@ -25,5 +27,7 @@
 [functions]
   # Directory where your TypeScript functions are
   node_bundler = "esbuild"
-  # Include node_modules in the bundle
-  included_files = ["server/**"]
+  # External modules that shouldn't be bundled
+  external_node_modules = ["@supabase/supabase-js", "@google/generative-ai", "@anthropic-ai/sdk", "openai"]
+  # Include server code
+  included_files = ["server/**/*"]

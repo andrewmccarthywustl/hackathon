@@ -179,10 +179,30 @@ These are embedded in your built frontend and accessible in the browser:
 
 ## Troubleshooting
 
+### 502 Bad Gateway Error
+This typically means the Netlify Function is crashing. To debug:
+
+1. **Check Netlify Function Logs**:
+   - Go to your Netlify dashboard
+   - Click on "Functions" tab
+   - Click on the "api" function
+   - View the logs to see the actual error
+
+2. **Common causes**:
+   - Missing environment variables (check all required vars are set)
+   - Supabase connection issues
+   - Import/module resolution errors
+   - Timeout (functions have a 10-second default timeout)
+
+3. **Verify environment variables are set**:
+   - Visit `https://your-site.netlify.app/api/health`
+   - Check that all `has*` fields return `true`
+
 ### Functions not working
 - Check Netlify Functions logs in your dashboard
 - Ensure `netlify.toml` is in the root directory
 - Verify environment variables are set correctly
+- Make sure you committed all files in `netlify/functions/`
 
 ### CORS errors
 - The CORS middleware is configured to allow all origins in production
@@ -191,11 +211,18 @@ These are embedded in your built frontend and accessible in the browser:
 ### Supabase connection issues
 - Verify `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are correct
 - Check your Supabase project is active and accessible
+- Ensure the service role key has proper permissions
 
 ### Build failures
 - Check the build logs in Netlify dashboard
 - Ensure all dependencies are in `package.json`
 - Try building locally first: `npm run build`
+- Check that TypeScript compilation succeeds
+
+### Import/Module errors
+- Netlify uses esbuild which handles TypeScript natively
+- If you see module resolution errors, check the paths in `netlify/functions/api.ts`
+- Ensure `external_node_modules` in `netlify.toml` includes all necessary packages
 
 ## Additional Resources
 
