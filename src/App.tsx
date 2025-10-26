@@ -19,7 +19,6 @@ function App() {
   const location = useLocation();
   const [currentView, setCurrentView] = useState<ViewType>('hub');
   const [currentProfile, setCurrentProfile] = useState<ResearcherProfile | null>(null);
-  const [googleUser, setGoogleUser] = useState<{ name: string; email: string } | null>(null);
 
   const viewToPath = useMemo<Record<ViewType, string>>(() => ({
     hub: '',
@@ -51,12 +50,7 @@ function App() {
   };
 
   const handleGoogleLogin = () => {
-    // Simulate Google login - in production, this would use OAuth
-    const mockGoogleUser = {
-      name: 'Dr. Sarah Johnson',
-      email: 'sarah.johnson@university.edu'
-    };
-    setGoogleUser(mockGoogleUser);
+    // Go directly to onboarding without authentication
     navigate('/onboarding');
   };
 
@@ -80,7 +74,6 @@ function App() {
 
   const handleLogout = () => {
     setCurrentProfile(null);
-    setGoogleUser(null);
     setCurrentView('chat');
     navigate('/');
   };
@@ -183,17 +176,13 @@ function App() {
       <Route
         path="/onboarding"
         element={
-          googleUser ? (
-            <div className="app onboarding-route">
-              <ResearcherOnboarding
-                googleEmail={googleUser.email}
-                googleName={googleUser.name}
-                onComplete={handleOnboardingComplete}
-              />
-            </div>
-          ) : (
-            <Navigate to="/" replace />
-          )
+          <div className="app onboarding-route">
+            <ResearcherOnboarding
+              googleEmail=""
+              googleName=""
+              onComplete={handleOnboardingComplete}
+            />
+          </div>
         }
       />
       <Route path="/app/*" element={mainApp} />
