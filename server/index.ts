@@ -13,7 +13,7 @@ dotenv.config();
 const app: Express = express();
 const PORT = parseInt(process.env.PORT || '3001', 10);
 
-// CORS configuration - Allow Netlify frontend and local development
+// CORS configuration - Allow Vercel, Netlify frontend and local development
 const allowedOrigins = [
   'https://synapse-hifi.netlify.app',
   'http://localhost:5173',
@@ -22,11 +22,22 @@ const allowedOrigins = [
   'http://127.0.0.1:3000'
 ];
 
+// Allow all Vercel preview and production domains
+const isVercelDomain = (origin: string) => {
+  return origin.endsWith('.vercel.app');
+};
+
 app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
 
+    // Allow Vercel domains (production and preview deployments)
+    if (origin && isVercelDomain(origin)) {
+      return callback(null, true);
+    }
+
+    // Allow explicitly listed origins
     if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
       callback(null, true);
     } else {
