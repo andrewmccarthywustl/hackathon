@@ -20,8 +20,8 @@ const AVATAR_ICONS = [
 
 export function ResearcherOnboarding({ googleEmail, googleName, onComplete }: ResearcherOnboardingProps) {
   const [profile, setProfile] = useState<Partial<ResearcherProfile>>({
-    name: '',
-    email: '',
+    name: googleName,
+    email: googleEmail,
     institution: '',
     department: '',
     researchInterests: [],
