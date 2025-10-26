@@ -1,6 +1,8 @@
 const sanitizeBaseUrl = (value: string) => value.replace(/\/$/, '');
 
-const fallbackBaseUrl = import.meta.env.MODE === 'development' ? 'http://localhost:3001' : '';
+const fallbackBaseUrl = import.meta.env.MODE === 'development'
+  ? 'http://localhost:3001'
+  : 'https://hackathon-production-eead.up.railway.app';
 const rawBaseUrl = typeof import.meta.env.VITE_API_BASE_URL === 'string'
   ? import.meta.env.VITE_API_BASE_URL
   : undefined;
