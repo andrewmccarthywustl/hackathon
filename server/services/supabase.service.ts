@@ -1,4 +1,8 @@
+import dotenv from 'dotenv';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+
+// Ensure environment variables are loaded before we read them.
+dotenv.config();
 
 let cachedClient: SupabaseClient | null = null;
 
