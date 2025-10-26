@@ -179,8 +179,20 @@ body, html {
 
 .hub-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
   gap: 1.5rem;
+  justify-content: center;
+  max-width: 720px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+@media (max-width: 720px) {
+  .hub-grid {
+    grid-template-columns: 1fr;
+    max-width: none;
+    justify-content: stretch;
+  }
 }
 
 .hub-card {
