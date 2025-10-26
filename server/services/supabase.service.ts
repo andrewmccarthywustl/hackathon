@@ -8,12 +8,10 @@ let cachedClient: SupabaseClient | null = null;
 
 const defaultProfilesTable = 'researcher_profiles';
 const defaultCompareTable = 'research_compare_snapshots';
-const defaultJobsTable = 'jobs';
 
 export const SUPABASE_TABLES = {
   profiles: process.env.SUPABASE_PROFILES_TABLE ?? defaultProfilesTable,
-  researchCompareSnapshots: process.env.SUPABASE_COMPARE_TABLE ?? defaultCompareTable,
-  jobs: process.env.SUPABASE_JOBS_TABLE ?? defaultJobsTable
+  researchCompareSnapshots: process.env.SUPABASE_COMPARE_TABLE ?? defaultCompareTable
 } as const;
 
 export function getSupabaseClient(): SupabaseClient {
