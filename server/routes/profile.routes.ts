@@ -73,6 +73,12 @@ export function createProfileRouter(): Router {
     try {
       const profile = req.body;
 
+      // Debug logging
+      logger.info(`Received profile data: ${JSON.stringify(profile, null, 2)}`);
+      logger.info(`Homepage: "${profile.homepage}" (Type: ${typeof profile.homepage})`);
+      logger.info(`ORCID: "${profile.orcid}" (Type: ${typeof profile.orcid})`);
+      logger.info(`Google Scholar: "${profile.googleScholar}" (Type: ${typeof profile.googleScholar})`);
+
       // Validate required fields
       if (!profile.name || !profile.email || !profile.institution) {
         return res.status(400).json({
@@ -85,9 +91,10 @@ export function createProfileRouter(): Router {
       // Get Supabase client (initialized on demand)
       const supabase = getSupabaseClient();
 
+      // Use upsert to handle both insert and update cases
       const { data, error } = await supabase
         .from(PROFILES_TABLE)
-        .insert({
+        .upsert({
           name: profile.name,
           email: profile.email,
           institution: profile.institution,
@@ -98,8 +105,9 @@ export function createProfileRouter(): Router {
           orcid: profile.orcid ?? null,
           google_scholar: profile.googleScholar ?? null,
           avatar_icon: profile.avatarIcon ?? null,
-          created_at: timestamp,
           updated_at: timestamp
+        }, {
+          onConflict: 'email'
         })
         .select()
         .single();
