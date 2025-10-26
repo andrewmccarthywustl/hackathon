@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 import multer from 'multer';
-import { AIRouter } from '../services/ai/ai-router';
+import { AIRouter } from '../services/ai/ai-router.js';
 import { getSupabaseClient, SUPABASE_TABLES } from '../services/supabase.service.js';
 import type { ArxivPaper } from '../types';
 

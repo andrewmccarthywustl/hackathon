@@ -1,10 +1,10 @@
 import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
-import { ChatMessage, ArxivPaper } from '../types';
-import { ArxivService } from './arxiv.service';
-import { SemanticScholarService } from './semantic-scholar.service';
-import { OpenAlexService } from './openalex.service';
-import { Logger } from '../utils/logger';
-import { BaseAIService, type AIResponse, type ChatContext } from './ai/base.service';
+import type { ChatMessage, ArxivPaper } from '../types';
+import { ArxivService } from './arxiv.service.js';
+import { SemanticScholarService } from './semantic-scholar.service.js';
+import { OpenAlexService } from './openalex.service.js';
+import { Logger } from '../utils/logger.js';
+import { BaseAIService, type AIResponse, type ChatContext } from './ai/base.service.js';
 
 export class GeminiService extends BaseAIService {
   private genAI: GoogleGenerativeAI;

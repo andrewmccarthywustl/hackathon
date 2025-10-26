@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { AIRouter } from '../services/ai/ai-router';
+import { AIRouter } from '../services/ai/ai-router.js';
 import type { ChatRequest } from '../types';
 
 export function createChatRouter(): Router {

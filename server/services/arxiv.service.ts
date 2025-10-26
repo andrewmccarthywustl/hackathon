@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ArxivPaper } from '../types';
+import type { ArxivPaper } from '../types';
 
 const ARXIV_API_URL = 'http://export.arxiv.org/api/query';
 

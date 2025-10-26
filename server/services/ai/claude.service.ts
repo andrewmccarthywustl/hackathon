@@ -1,9 +1,9 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { BaseAIService, type AIResponse, type ChatContext } from './base.service';
-import { ArxivService } from '../arxiv.service';
-import { SemanticScholarService } from '../semantic-scholar.service';
-import { OpenAlexService } from '../openalex.service';
-import { Logger } from '../../utils/logger';
+import { BaseAIService, type AIResponse, type ChatContext } from './base.service.js';
+import { ArxivService } from '../arxiv.service.js';
+import { SemanticScholarService } from '../semantic-scholar.service.js';
+import { OpenAlexService } from '../openalex.service.js';
+import { Logger } from '../../utils/logger.js';
 import type { ArxivPaper } from '../../types';
 
 export class ClaudeService extends BaseAIService {

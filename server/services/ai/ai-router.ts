@@ -1,8 +1,8 @@
-import { BaseAIService } from './base.service';
-import { GeminiService } from '../gemini.service';
-import { OpenAIService } from './openai.service';
-import { ClaudeService } from './claude.service';
-import { loadAIConfig, validateAIConfig } from '../../config/ai.config';
+import { BaseAIService } from './base.service.js';
+import { GeminiService } from '../gemini.service.js';
+import { OpenAIService } from './openai.service.js';
+import { ClaudeService } from './claude.service.js';
+import { loadAIConfig, validateAIConfig } from '../../config/ai.config.js';
 
 /**
  * AI Router - Factory pattern for creating AI service instances
