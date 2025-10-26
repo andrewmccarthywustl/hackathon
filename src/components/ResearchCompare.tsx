@@ -213,49 +213,98 @@ export function ResearchCompare() {
       const formData = new FormData();
       formData.append('text', researchText);
 
-      const response = await fetch(apiUrl('/api/compare-research'), {
+      // Start the job
+      const startResponse = await fetch(apiUrl('/api/compare-research'), {
         method: 'POST',
         body: formData,
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to analyze research');
+      if (!startResponse.ok) {
+        throw new Error('Failed to start analysis');
       }
 
-      const data: ResearchCompareResponse = await response.json();
+      const { jobId } = await startResponse.json();
 
-      clearLoadingIntervals();
-      setActivePhase(LOADING_PHASES.length - 1);
-      setLoadingProgress(100);
+      // Poll for progress and results
+      const pollInterval = setInterval(async () => {
+        try {
+          // Check job status
+          const statusResponse = await fetch(apiUrl(`/api/compare-research/status/${jobId}`));
+          if (statusResponse.ok) {
+            const statusData = await statusResponse.json();
 
-      // Brief pause to show 100% before displaying results
-      await new Promise(resolve => setTimeout(resolve, 350));
+            // Update progress bar based on actual backend progress
+            if (statusData.progress !== undefined) {
+              setLoadingProgress(statusData.progress);
 
-      setAnalysis(data.analysis || '');
-      setSummary(data.summary || '');
-      setSimilarPapers(data.similarPapers || []);
-      setMetrics(data.metrics ?? null);
+              // Map progress to phases
+              const phaseIndex = LOADING_PHASES.findIndex(p => statusData.progress < p.target);
+              if (phaseIndex >= 0) {
+                setActivePhase(phaseIndex);
+              } else {
+                setActivePhase(LOADING_PHASES.length - 1);
+              }
+            }
 
-      const trimmedInput = researchText.trim();
-      const newEntry: ResearchHistoryEntry = {
-        id: `${Date.now()}`,
-        createdAt: new Date().toISOString(),
-        inputPreview: trimmedInput.slice(0, 180) + (trimmedInput.length > 180 ? '…' : ''),
-        summary: data.summary || '',
-        analysis: data.analysis || '',
-        metrics: data.metrics ?? null,
-        similarPapers: data.similarPapers || [],
-      };
+            // Check if job is complete
+            if (statusData.status === 'completed') {
+              clearInterval(pollInterval);
 
-      setHistory((prev) => {
-        const updated = [newEntry, ...prev];
-        return updated.slice(0, MAX_HISTORY_ITEMS);
-      });
-      setActiveHistoryId(newEntry.id);
+              // Fetch the result
+              const resultResponse = await fetch(apiUrl(`/api/compare-research/result/${jobId}`));
+              if (!resultResponse.ok) {
+                throw new Error('Failed to fetch results');
+              }
+
+              const data: ResearchCompareResponse = await resultResponse.json();
+
+              clearLoadingIntervals();
+              setActivePhase(LOADING_PHASES.length - 1);
+              setLoadingProgress(100);
+
+              // Brief pause to show 100% before displaying results
+              await new Promise(resolve => setTimeout(resolve, 350));
+
+              setAnalysis(data.analysis || '');
+              setSummary(data.summary || '');
+              setSimilarPapers(data.similarPapers || []);
+              setMetrics(data.metrics ?? null);
+
+              const trimmedInput = researchText.trim();
+              const newEntry: ResearchHistoryEntry = {
+                id: `${Date.now()}`,
+                createdAt: new Date().toISOString(),
+                inputPreview: trimmedInput.slice(0, 180) + (trimmedInput.length > 180 ? '…' : ''),
+                summary: data.summary || '',
+                analysis: data.analysis || '',
+                metrics: data.metrics ?? null,
+                similarPapers: data.similarPapers || [],
+              };
+
+              setHistory((prev) => {
+                const updated = [newEntry, ...prev];
+                return updated.slice(0, MAX_HISTORY_ITEMS);
+              });
+              setActiveHistoryId(newEntry.id);
+              setIsAnalyzing(false);
+              resetLoadingIndicators();
+            } else if (statusData.status === 'failed') {
+              clearInterval(pollInterval);
+              throw new Error('Analysis failed');
+            }
+          }
+        } catch (pollError) {
+          clearInterval(pollInterval);
+          clearLoadingIntervals();
+          setError(pollError instanceof Error ? pollError.message : 'Error during analysis');
+          setIsAnalyzing(false);
+          resetLoadingIndicators();
+        }
+      }, 1000); // Poll every second
+
     } catch (err) {
       clearLoadingIntervals();
       setError(err instanceof Error ? err.message : 'An error occurred during analysis');
-    } finally {
       setIsAnalyzing(false);
       resetLoadingIndicators();
     }
