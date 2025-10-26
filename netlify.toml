@@ -1,0 +1,29 @@
+[build]
+  # Build command for the frontend
+  command = "npm run build"
+  # Output directory for the built frontend
+  publish = "dist"
+  # Functions directory for serverless backend
+  functions = "netlify/functions"
+
+[build.environment]
+  # Node version
+  NODE_VERSION = "20"
+
+# Redirect all API requests to serverless functions
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+
+# SPA fallback - redirect all other requests to index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[functions]
+  # Directory where your TypeScript functions are
+  node_bundler = "esbuild"
+  # Include node_modules in the bundle
+  included_files = ["server/**"]
