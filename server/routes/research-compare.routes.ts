@@ -122,7 +122,12 @@ Make sure the JSON is valid, uses double quotes, and stays on a single line. Nev
 Please search for relevant papers and provide a comprehensive analysis with these metrics.`;
 
       // Use the AI service to analyze and search for papers
+      // This can take 20-30 seconds for complex requests
+      console.log('Starting AI research comparison analysis...');
+      const startTime = Date.now();
       const result = await aiService.chat(comparisonPrompt, []);
+      const duration = Date.now() - startTime;
+      console.log(`AI analysis completed in ${duration}ms`);
 
       // Parse metrics & summary from the response
       const metrics: ParsedMetrics = {

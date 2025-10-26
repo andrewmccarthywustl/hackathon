@@ -188,25 +188,25 @@ export function ResearcherOnboarding({ googleEmail, googleName, onComplete }: Re
               </p>
 
               <div className="form-group">
-                <label>Name</label>
+                <label>Name <span className="required">*</span></label>
                 <input
                   type="text"
                   value={profile.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
                   placeholder="Your full name"
-                  disabled
                 />
+                <p className="help-text">You can edit this if your Google name differs from your preferred name</p>
               </div>
 
               <div className="form-group">
-                <label>Email</label>
+                <label>Email <span className="required">*</span></label>
                 <input
                   type="email"
                   value={profile.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
                   placeholder="your.email@institution.edu"
-                  disabled
                 />
+                <p className="help-text">You can use a different email if preferred</p>
               </div>
 
               <div className="form-group">

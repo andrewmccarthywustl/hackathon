@@ -31,3 +31,9 @@
   external_node_modules = ["@supabase/supabase-js", "@google/generative-ai", "@anthropic-ai/sdk", "openai"]
   # Include server code
   included_files = ["server/**/*"]
+
+# Specific function configuration for research compare endpoint
+[[functions]]
+  path = "/.netlify/functions/api"
+  # Increase timeout for AI processing (max 26 seconds on free tier)
+  timeout = 26

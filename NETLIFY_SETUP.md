@@ -179,6 +179,22 @@ These are embedded in your built frontend and accessible in the browser:
 
 ## Troubleshooting
 
+### 504 Gateway Timeout Error
+This means the Netlify Function is taking too long to respond (max 26 seconds on free tier).
+
+**For Research Compare endpoint:**
+- AI analysis can take 20-30 seconds for complex research queries
+- The timeout is set to maximum (26 seconds on free tier)
+- If you frequently hit timeouts, consider:
+  - Upgrading to Netlify Pro (timeout up to 100 seconds)
+  - Using Gemini Flash model (faster than Claude/GPT-4)
+  - Simplifying the research description
+
+**Solutions:**
+1. Check function logs to see how long requests are taking
+2. Switch AI provider in environment variables to `AI_PROVIDER=gemini`
+3. Upgrade to Netlify Pro for longer timeouts
+
 ### 502 Bad Gateway Error
 This typically means the Netlify Function is crashing. To debug:
 
