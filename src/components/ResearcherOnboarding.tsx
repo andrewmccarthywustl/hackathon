@@ -63,13 +63,16 @@ export function ResearcherOnboarding({ googleEmail, googleName, onComplete }: Re
 
   const canProceed = () => {
     if (currentStep === 1) {
-      return profile.avatarIcon && profile.avatarIcon !== '';
-    }
-    if (currentStep === 2) {
       return profile.institution && profile.institution.trim() !== '';
     }
-    if (currentStep === 3) {
+    if (currentStep === 2) {
       return (profile.researchInterests?.length || 0) > 0;
+    }
+    if (currentStep === 3) {
+      return true; // Professional links are optional
+    }
+    if (currentStep === 4) {
+      return profile.avatarIcon && profile.avatarIcon !== '';
     }
     return true;
   };
@@ -148,39 +151,8 @@ export function ResearcherOnboarding({ googleEmail, googleName, onComplete }: Re
         </div>
 
         <div className="onboarding-content">
-          {/* Step 1: Avatar Selection */}
+          {/* Step 1: Basic Information */}
           {currentStep === 1 && (
-            <div className="step-content">
-              <h2>Choose Your Avatar</h2>
-              <p className="step-description">
-                Select an icon to represent your profile
-              </p>
-
-              <div className="avatar-preview">
-                {profile.avatarIcon ? (
-                  <span className="avatar-icon-large">{profile.avatarIcon}</span>
-                ) : (
-                  <div className="avatar-placeholder">?</div>
-                )}
-              </div>
-
-              <div className="avatar-grid">
-                {AVATAR_ICONS.map((icon, index) => (
-                  <button
-                    key={index}
-                    className={`avatar-option ${profile.avatarIcon === icon ? 'selected' : ''}`}
-                    onClick={() => handleIconSelect(icon)}
-                    type="button"
-                  >
-                    {icon}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Step 2: Basic Information */}
-          {currentStep === 2 && (
             <div className="step-content">
               <h2>Basic Information</h2>
               <p className="step-description">
@@ -232,8 +204,8 @@ export function ResearcherOnboarding({ googleEmail, googleName, onComplete }: Re
             </div>
           )}
 
-          {/* Step 3: Research Interests */}
-          {currentStep === 3 && (
+          {/* Step 2: Research Interests */}
+          {currentStep === 2 && (
             <div className="step-content">
               <h2>Research Interests</h2>
               <p className="step-description">
@@ -280,8 +252,8 @@ export function ResearcherOnboarding({ googleEmail, googleName, onComplete }: Re
             </div>
           )}
 
-          {/* Step 4: Professional Links */}
-          {currentStep === 4 && (
+          {/* Step 3: Professional Links */}
+          {currentStep === 3 && (
             <div className="step-content">
               <h2>Professional Links</h2>
               <p className="step-description">
@@ -316,6 +288,37 @@ export function ResearcherOnboarding({ googleEmail, googleName, onComplete }: Re
                   onChange={(e) => handleInputChange('googleScholar', e.target.value)}
                   placeholder="https://scholar.google.com/citations?user=..."
                 />
+              </div>
+            </div>
+          )}
+
+          {/* Step 4: Avatar Selection */}
+          {currentStep === 4 && (
+            <div className="step-content">
+              <h2>Choose Your Avatar</h2>
+              <p className="step-description">
+                Select an icon to represent your profile
+              </p>
+
+              <div className="avatar-preview">
+                {profile.avatarIcon ? (
+                  <span className="avatar-icon-large">{profile.avatarIcon}</span>
+                ) : (
+                  <div className="avatar-placeholder">?</div>
+                )}
+              </div>
+
+              <div className="avatar-grid">
+                {AVATAR_ICONS.map((icon, index) => (
+                  <button
+                    key={index}
+                    className={`avatar-option ${profile.avatarIcon === icon ? 'selected' : ''}`}
+                    onClick={() => handleIconSelect(icon)}
+                    type="button"
+                  >
+                    {icon}
+                  </button>
+                ))}
               </div>
             </div>
           )}
