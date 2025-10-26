@@ -62,12 +62,13 @@ interface ResearchMetrics {
   researchMaturity: string;
 }
 
-interface ResearchCompareResponse {
-  analysis: string;
-  summary?: string;
-  similarPapers?: ArxivPaper[];
-  metrics?: ResearchMetrics | null;
-}
+// Keeping this for backward compatibility with non-streaming endpoint
+// interface ResearchCompareResponse {
+//   analysis: string;
+//   summary?: string;
+//   similarPapers?: ArxivPaper[];
+//   metrics?: ResearchMetrics | null;
+// }
 
 interface ResearchHistoryEntry {
   id: string;
@@ -118,40 +119,7 @@ export function ResearchCompare() {
     }
   };
 
-  const startLoadingAnimation = () => {
-    clearLoadingIntervals();
-    phaseRef.current = 0;
-    setActivePhase(0);
-    setLoadingMessageIndex(0);
-    setLoadingProgress(0);
-
-    progressIntervalRef.current = window.setInterval(() => {
-      setLoadingProgress((prev) => {
-        const currentPhase = LOADING_PHASES[phaseRef.current] ?? LOADING_PHASES[LOADING_PHASES.length - 1];
-        const target = currentPhase.target;
-        const finalTarget = LOADING_PHASES[LOADING_PHASES.length - 1].target;
-
-        if (prev >= target) {
-          if (phaseRef.current < LOADING_PHASES.length - 1) {
-            phaseRef.current += 1;
-            setActivePhase(phaseRef.current);
-            return prev;
-          }
-          return Math.min(prev + 0.15, finalTarget);
-        }
-
-        const increment = phaseRef.current < LOADING_PHASES.length - 2
-          ? 0.4 + Math.random() * 0.4
-          : 0.25 + Math.random() * 0.2;
-
-        return Math.min(prev + increment, target);
-      });
-    }, 350);
-
-    tickerIntervalRef.current = window.setInterval(() => {
-      setLoadingMessageIndex((prev) => (prev + 1) % LOADING_TICKER.length);
-    }, 2200);
-  };
+  // Removed fake animation - now using real progress from backend stream
 
   const resetLoadingIndicators = () => {
     phaseRef.current = 0;
@@ -207,51 +175,95 @@ export function ResearchCompare() {
     setSummary('');
     setSimilarPapers([]);
     setMetrics(null);
-    startLoadingAnimation();
+    clearLoadingIntervals();
+    resetLoadingIndicators();
 
     try {
       const formData = new FormData();
       formData.append('text', researchText);
 
-      const response = await fetch(apiUrl('/api/compare-research'), {
+      const response = await fetch(apiUrl('/api/compare-research-stream'), {
         method: 'POST',
         body: formData,
       });
 
       if (!response.ok) {
-        throw new Error('Failed to analyze research');
+        throw new Error('Failed to start analysis');
       }
 
-      const data: ResearchCompareResponse = await response.json();
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
 
-      clearLoadingIntervals();
-      setActivePhase(LOADING_PHASES.length - 1);
-      setLoadingProgress(100);
+      if (!reader) {
+        throw new Error('Stream not available');
+      }
 
-      // Brief pause to show 100% before displaying results
-      await new Promise(resolve => setTimeout(resolve, 350));
+      let buffer = '';
 
-      setAnalysis(data.analysis || '');
-      setSummary(data.summary || '');
-      setSimilarPapers(data.similarPapers || []);
-      setMetrics(data.metrics ?? null);
+      while (true) {
+        const { done, value } = await reader.read();
 
-      const trimmedInput = researchText.trim();
-      const newEntry: ResearchHistoryEntry = {
-        id: `${Date.now()}`,
-        createdAt: new Date().toISOString(),
-        inputPreview: trimmedInput.slice(0, 180) + (trimmedInput.length > 180 ? '…' : ''),
-        summary: data.summary || '',
-        analysis: data.analysis || '',
-        metrics: data.metrics ?? null,
-        similarPapers: data.similarPapers || [],
-      };
+        if (done) break;
 
-      setHistory((prev) => {
-        const updated = [newEntry, ...prev];
-        return updated.slice(0, MAX_HISTORY_ITEMS);
-      });
-      setActiveHistoryId(newEntry.id);
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.slice(6));
+
+              if (data.type === 'progress') {
+                setLoadingProgress(data.progress);
+
+                // Map progress to phases
+                const phaseIndex = LOADING_PHASES.findIndex(p => data.progress < p.target);
+                if (phaseIndex >= 0) {
+                  setActivePhase(phaseIndex);
+                  phaseRef.current = phaseIndex;
+                } else {
+                  setActivePhase(LOADING_PHASES.length - 1);
+                  phaseRef.current = LOADING_PHASES.length - 1;
+                }
+              } else if (data.type === 'complete') {
+                setLoadingProgress(100);
+                setActivePhase(LOADING_PHASES.length - 1);
+
+                // Brief pause to show 100% before displaying results
+                await new Promise(resolve => setTimeout(resolve, 350));
+
+                const result = data.data;
+                setAnalysis(result.analysis || '');
+                setSummary(result.summary || '');
+                setSimilarPapers(result.similarPapers || []);
+                setMetrics(result.metrics ?? null);
+
+                const trimmedInput = researchText.trim();
+                const newEntry: ResearchHistoryEntry = {
+                  id: `${Date.now()}`,
+                  createdAt: new Date().toISOString(),
+                  inputPreview: trimmedInput.slice(0, 180) + (trimmedInput.length > 180 ? '…' : ''),
+                  summary: result.summary || '',
+                  analysis: result.analysis || '',
+                  metrics: result.metrics ?? null,
+                  similarPapers: result.similarPapers || [],
+                };
+
+                setHistory((prev) => {
+                  const updated = [newEntry, ...prev];
+                  return updated.slice(0, MAX_HISTORY_ITEMS);
+                });
+                setActiveHistoryId(newEntry.id);
+              } else if (data.type === 'error') {
+                throw new Error(data.error);
+              }
+            } catch (parseError) {
+              console.warn('Failed to parse SSE message:', parseError);
+            }
+          }
+        }
+      }
     } catch (err) {
       clearLoadingIntervals();
       setError(err instanceof Error ? err.message : 'An error occurred during analysis');
