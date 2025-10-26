@@ -22,9 +22,13 @@ const allowedOrigins = [
   'http://127.0.0.1:3000'
 ];
 
-// Allow all Vercel preview and production domains
+// Allow all Vercel and Render preview and production domains
 const isVercelDomain = (origin: string) => {
   return origin.endsWith('.vercel.app');
+};
+
+const isRenderDomain = (origin: string) => {
+  return origin.endsWith('.onrender.com');
 };
 
 app.use(cors({
@@ -34,6 +38,11 @@ app.use(cors({
 
     // Allow Vercel domains (production and preview deployments)
     if (origin && isVercelDomain(origin)) {
+      return callback(null, true);
+    }
+
+    // Allow Render domains (production and preview deployments)
+    if (origin && isRenderDomain(origin)) {
       return callback(null, true);
     }
 
