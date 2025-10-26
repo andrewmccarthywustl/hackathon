@@ -12,7 +12,13 @@
   # Don't fail on warnings
   NODE_OPTIONS = "--max-old-space-size=4096"
 
-# Redirect all API requests to serverless functions
+# Redirect compare-research to dedicated function with longer timeout
+[[redirects]]
+  from = "/api/compare-research"
+  to = "/.netlify/functions/compare-research/api/compare-research"
+  status = 200
+
+# Redirect all other API requests to main serverless function
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api/:splat"
@@ -34,6 +40,11 @@
 
 # Individual function configuration
 [functions."api"]
-  # Increase timeout for AI processing (requires Netlify Pro for >26 seconds)
-  # Free tier max is 26 seconds, Pro tier allows up to 100 seconds
-  timeout = 60
+  # Maximum timeout - 26 seconds on free tier
+  timeout = 26
+
+# Separate function for long-running research comparison
+[functions."compare-research"]
+  # Set to maximum - Netlify limits: Free tier = 26s, Pro tier = 100s
+  # Background functions can run longer but need different invocation pattern
+  timeout = 300
